@@ -20,7 +20,7 @@ def create_actor_list_from_dl(h2_title,element):
                         if element[dd_index].name == 'dd':
                             
                             dd_text+=re.sub(pattern, '',element[dd_index].get_text())
-                            if dd_index == index+1 and ('声' in element[dd_index].get_text()): 
+                            if dd_index == index+1 and ('声' in element[dd_index].get_text() or '演' in element[dd_index].get_text()): 
                                 actors = element[dd_index].find_all('a')
                                 # print(actors_disc)
                                 for actor in actors:
@@ -257,3 +257,84 @@ if __name__ == '__main__':
     # for v in return_table_list:
 
     #     print(f"{v}")
+
+###################################################################################################
+#文字をエスケープするための関数
+def encode_filename(filename):
+    """Windowsとhtmlでファイル名として使用できない文字を全角文字に置換"""
+    replacements = {
+        '<': '_enc-01',
+        '>': '_enc-02',
+        ':': '_enc-03',
+        '"': '_enc-04',
+        '/': '_enc-05',
+        '\\': '_enc-06',  
+        '|': '_enc-07',
+        '?': '_enc-08',
+        '*': '_enc-09',
+        '&': '_enc-10',
+        '+': '_enc-11',
+        '#': '_enc-12',
+        '%': '_enc-13',
+        "'": '_enc-14',    
+        '`':  '_enc-15',   
+        '^': '_enc-16',   
+        ')': '_enc-17',   
+        '(': '_enc-18',   
+        '}': '_enc-19',   
+        '{': '_enc-20',   
+        ']': '_enc-21',   
+        '[': '_enc-22',   
+        ';': '_enc-23',   
+        '@': '_enc-24',   
+        '=': '_enc-25',   
+        '$': '_enc-26',   
+        ',': '_enc-27',   
+        ' ': '_enc-28',
+        '　':'_enc-29',
+        '（':'_enc-30', #なんか全角の場合もCSSセレクタとして使用するのはだめっぽい
+        '）':'_enc-31',
+    }
+    for src, target in replacements.items():
+        filename = filename.replace(src, target)
+    return filename
+
+def decode_filename(filename):
+    """encodeしたファイル名をdecodeして戻す"""
+    replacements = {
+        '_enc-01': '<',
+        '_enc-02': '>',
+        '_enc-03': ':',
+        '_enc-04': '"',
+        '_enc-05': '/',
+        '_enc-06': '\\',
+        '_enc-07': '|',
+        '_enc-08': '?',
+        '_enc-09': '*',
+        '_enc-10': '&',
+        '_enc-11': '+',
+        '_enc-12': '#',
+        '_enc-13': '%',
+        '_enc-14': "'",
+        '_enc-15': '`',
+        '_enc-16': '^',
+        '_enc-17': ')',
+        '_enc-18': '(',
+        '_enc-19': '}',
+        '_enc-20': '{',
+        '_enc-21': ']',
+        '_enc-22': '[',
+        '_enc-23': ';',
+        '_enc-24': '@',
+        '_enc-25': '=',
+        '_enc-26': '$',
+        '_enc-27': ',',
+        '_enc-28': ' ',
+        '_enc-29': '　',
+        '_enc-30':'（',
+        '_enc-31':'）',
+    }
+    for src, target in replacements.items():
+        filename = filename.replace(src, target)
+    return filename
+###################################################################################################
