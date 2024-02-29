@@ -1,0 +1,130 @@
+
+.details, .summary, .details_content {
+    font-size: 16px; /* 好みのフォントサイズに調整してください */
+}
+
+.details {
+    .summary {
+        position: relative;
+        display: block;
+        padding: 10px 10px 10px 30px;
+        cursor: pointer;
+        /* カーソルをポインターに */
+        font-weight: bold;
+        background-color: #e2f0f7;
+        transition: 0.2s;
+
+        &::-webkit-details-marker {
+            display: none;
+        }
+
+        &::after {
+            content: "";
+            position: absolute;
+            display: block;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: 0.2s;
+            left: 0.1em;
+            width: 1.5em;
+            height: 1.5em;
+            background: url('https://api.iconify.design/icon-park/right.svg') no-repeat center / contain;
+        }
+    }
+
+    &.is-opened>.summary::after {
+        transform: translateY(-50%) rotate(90deg);
+    }
+
+    .summary:hover {
+        background-color: #ccebfb;
+    }
+
+
+
+    .details_content {
+        position: relative;
+        overflow: hidden;
+        padding: 5px 0px 0px 40px;/*summaryからどれくらい離れてるかを決める*/
+        height: auto;
+        opacity: 1;
+        visibility: visible;
+        transition: padding .25s, height .25s, opacity .25s;
+    }
+
+    &:not(.is-opened)>.details_content {
+        height: 0;
+        opacity: 0;
+        overflow: hidden;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    &+.details {
+        margin-top: 5px;
+        /*項目と項目との隙間を決める*/
+    }
+}
+
+
+.main_content {
+    width: 700px;
+    /* height: 50px; */
+    /* 水平方向の中央揃え */
+    margin: 0 auto;
+}
+
+#list-container li {
+    list-style-type: none; /* リストの点を消す */
+    margin: 10px; /* マージンで少し間隔を開ける */
+    padding: 10px; /* パディングで文字と枠の間隔を開ける */
+    background-color: rgb(211, 236, 186); /* 背景色を緑にする */
+    color: white; /* 文字色を白にする */
+    border-radius: 10px; /* 四隅をラウンドさせる */
+    transition: background-color 0.3s; /* 背景色の変化を滑らかにする */
+}
+
+#list-container li a {
+    text-decoration: none; /* リンクの下線を消す */
+    color: rgb(0, 0, 0); /* リンクの文字色を黒にする */
+    display: block; /* リンクをブロック要素にして、li全体がクリッカブルになるようにする */
+}
+
+#list-container li:hover {
+    background-color: rgba(0, 0, 0, 0.1); /* ホバー時に背景色を少し暗くする */
+}
+
+
+
+
+.about_manga_container{
+    width: 700px;
+    /* height: 50px; */
+    /* 水平方向の中央揃え */
+    margin: 0 auto;
+    
+    display: flex;
+    justify-content: space-around;
+  }
+  .other-link-container{
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .manga-item {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .manga-item img {
+            width: 153px;
+            height: 218px;
+            display: block;
+            margin: 0 auto;
+        }
+        .manga-item a {
+            text-decoration: none;
+            color: #000;
+        }
+        .manga-title {
+            margin-top: 5px;
+        }

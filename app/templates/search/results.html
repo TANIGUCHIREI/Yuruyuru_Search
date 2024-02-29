@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<script>
+  window.onload = function() {
+    document.getElementById('search_result').scrollIntoView(); //検索結果ブロックに自動的に飛ぶ
+  }
+</script>
+
+<form method="post" action="/search" id="searchForm">
+  <div class="checkbox-container">
+    <label for="useGPT" ><span>Use GPT?</span></label>
+    <input type="checkbox" id="useGPT" name="useGPT" {{ 'checked' if  form_info['useGPT'] else ''}}>
+
+    <label for="searchall"><span>すべて検索</span></label>
+    <input type="checkbox" id="searchall" name="searchall" {{ 'checked' if form_info['searchall']  else ''}}>
+
+    <label for="toggleSliders">検索の割合を指定</label>
+    <input type="checkbox" id="toggleSliders" {{form_info['toggleSliders']}}>
+
+    <label for="story_age_checkbox">作品の年代を指定</label {{ 'checked' if form_info['story_age_checkbox']  else ''}}>
+    <input type="checkbox" id="story_age_checkbox">
+  </div>
+
+  
+
+  <div class="slider_container">
+    <label for="overview_rate"><span class="range_bar">概要</span></label>
+    <input type="range" id="overview_rate" name="overview_rate" min="0" max="100" disabled>
+    <label for="story_rate"><span class="range_bar">ストーリー</span></label>
+    <input type="range" id="story_rate" name="story_rate" min="0" max="100" disabled>
+    <label for="character_rate"><span class="range_bar">キャラクター</span></label>
+    <input type="range" id="character_rate" name="character_rate" min="0" max="100" disabled>
+  </div>
+
+  <div class="range-wrapper">
+    <div id="range"></div>
+  </div>
+
+  <!-- フォーム内に隠しフィールドを追加 -->
+  <input type="hidden" id="liData" name="liData" value={{','.join(categories) if categories else ''}}>
+  <div class="autoComplete_container">
+    <br>
+    <label >ジャンルの検索方法</label>
+    <br>
+    <input type="radio" name="AndOR" value="AND" {{ 'checked' if form_info['AndOR'] == 'AND' else '' }}  />AND
+    <input type="radio" name="AndOR" value="OR" {{ 'checked' if form_info['AndOR'] == 'OR' else '' }} />OR
+    <input type="text" id="autoComplete">
+        <ul id="list-container">
+          {% if categories %}
+          {% for category in categories %}
+          <li><span>×</span>{{category}}</li>
+          {% endfor %}
+          {% endif %}
+        </ul>
+
+  </div>
+
+  <textarea id="inputText" name="inputText" rows="4" placeholder="検索したい質問の要素を入力してください" required>{{input_text}}</textarea>
+  <!-- <input type="type" id="inputText" name="inputText" placeholder="検索したい質問の要素を入力してください" required> -->
+
+  <input type="submit" value="検索">
+
+  <div id="loadingIndicator" style="display: none;">
+    Loading...
+  </div>
+</form>
+
+<h2 id="search_result" style="text-align:center">検索結果</h2> 
+<div class="result-container">
+   
+  <table id="manga-table">
+    <tr>
+      <th id="sort-recommendation" class="sortable">おすすめランク↕</th>
+      <th id="sort-started-at" class="sortable">連載開始時↕</th>
+      <th>漫画タイトルと画像</th>
+      {% if actor_select %}<th>キャラクター</th>{% endif %}
+    </tr>
+    {% for result in results %}
+    <tr>
+      <td>
+        <div class="progress-container">
+          <div class="progress-bar" style="width: {{ result['similarity'] }}%">{{ result['similarity'] }}%</div>
+        </div>
+      </td>
+      <td>{{ result["started_at"] }}</td>
+      <td style="text-align: center;">
+        <a href="{{ result['amazon_url'] }}" rel="noopener noreferrer" style="text-decoration: none; color: black;">
+          <div style="word-wrap: break-word; width: 200px; margin: auto;">
+            <div style="font-weight: bold;">{{ result["title"] }}</div>
+            {% if result['img_url'] %}
+              <img src="{{ result['img_url'] }}" alt="{{ result['title'] }}" style="display:block; margin: auto; width: 100%; max-width: 153px; height: auto;">
+            {% else %}
+              <img src="{{ url_for('static', filename='images/no_image_tate.jpg') }}" alt="No Image" style="display:block; margin: auto; width: 100%; max-width: 153px; height: auto;">
+            {% endif %}
+          </div>
+        </a>
+      </td>
+      {% if actor_select %}
+        <td><a href="{{ result['amazon_url'] +'&character_id='+ result["character_id"]}}" >{{result["character"]}}</a></td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </table>
+
+  <!-- 右に表示される検索トップに飛ぶやつ -->
+  <p id="search-top"><img href="#" src="{{ url_for('static', filename='images/search_mushimegane.png') }}"></img></p>
+</div>
+
+ 
+{% endblock %}
