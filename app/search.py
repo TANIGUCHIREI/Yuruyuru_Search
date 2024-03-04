@@ -1,4 +1,4 @@
-import pickle,time
+import pickle
 
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
@@ -11,7 +11,7 @@ from use_database4 import search_database,return_manga_info,decode_filename
 # -> 最終的にapp内に移動させる
 
 
-with open("./category_and_embedding_matrix/category_list.pickle","rb") as f:
+with open("./data_for_search/categories_list.pickle","rb") as f:
     category_list = pickle.load(f)
 
 

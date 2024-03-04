@@ -5,8 +5,8 @@
 import os, json, pickle,re
 import openai
 from openai import OpenAI
-import numpy as np
-
+import pickle,gc
+import torch
 try:
     OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 except:
@@ -15,7 +15,7 @@ except:
     load_dotenv(dotenv_path)
     OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
 
-print(OPENAI_API_KEY)
+# print(OPENAI_API_KEY)
 client = OpenAI(api_key=OPENAI_API_KEY)
 
 
@@ -37,56 +37,57 @@ with open ("./data_for_search/info_for_search_dict.pickle", mode='br') as f:
             if media_data["amazon_img"] !="":
                 amazon_img =media_data["amazon_img"]
                 amazon_url = media_data["amazon_url"]
-        year, title, url,amazon_url,img_url,actors_dict = data["page_year"], data["page_url"],page_title,amazon_url,amazon_img,data["actor_dict"]
-        manga_title_dict[page_title] = [year,url,amazon_url,img_url,actors_dict]
+        year, title, url,amazon_url,img_url,actors_dict,genre,infobox_dict = data["page_year"], data["page_url"],page_title,amazon_url,amazon_img,data["actor_dict"],data["genre"],data["infobox_dict"]
+        manga_title_dict[page_title] = [year,url,amazon_url,img_url,actors_dict,genre,infobox_dict]
+
+        #次にyear_and_data_dictの作成
+        try:year_and_data_dict[year].append({"title":page_title,"raw_categories":data["categories"],"actors_dict":data["actor_dict"],"infobox_list":data["infobox_list"]})
+        except: year_and_data_dict[year] = [{"title":page_title,"raw_categories":data["categories"],"actors_dict":data["actor_dict"],"infobox_list":data["infobox_list"]}]
 
 
-for embedding_json in os.listdir("./partially_use_wikipedia/"):
-
-    # if "2016" not in embedding_json: continue #2023年のデータだけとってくる。開発用・完成したらここはコメントアウト！
-
-    with open("./partially_use_wikipedia/" + embedding_json ,encoding="utf-8") as f:
-        json_file = json.load(f)
-        year = int(embedding_json.replace(".json",""))
-        print(f"{year}年のベクトルデータを読み込み中...")
-        selected_data_list = [] #embeddingなどは行列に格納して使わないのでここで消してしまう
-        for data in json_file:
-            selected_data_list.append({"title":data["title"],"raw_categories":data["raw_categories"],"actors_dict":data["actors_dict"],"infobox_list":data["infobox_list"]})
-        year_and_data_dict[year] = selected_data_list
-        #full_data_list += json_file #読み込んだファイルを結合！
 
 
-with open("../../data_for_search/categories_list.pickle","rb") as f:
+with open("./data_for_search/categories_list.pickle","rb") as f:
     full_categories_list = pickle.load(f)
 
 
 ############torchの行列計算に対応したcategory行列を読み込む
-with open("./category_and_embedding_matrix/category_list.pickle","rb") as f:
-    category_list = pickle.load(f)
+# with open("./category_and_embedding_matrix/category_list.pickle","rb") as f:
+#     category_list = pickle.load(f)
 
-with open("./category_and_embedding_matrix/category_embedding_matrix.pickle","rb") as f:
-    category_embedding_matrix = pickle.load(f)
+# with open("./category_and_embedding_matrix/category_embedding_matrix.pickle","rb") as f:
+#     category_embedding_matrix = pickle.load(f)
 
 
 ##################以下は似た漫画をサジェストするための読み込み部分＆関数、最終的にuse_database4.pyを作る予定############
 #保存した行列たちを読み出す
-import pickle,torch
-with open("../../data_for_search/title_and_embedding_matrix/title_list.pickle","rb") as f:
+
+with open("./data_for_search/title_and_embedding_matrix/title_list.pickle","rb") as f:
     title_list = pickle.load(f)
 
-with open("../../data_for_search/title_and_embedding_matrix/overview_embedding_matrix.pickle","rb") as f:
+with open("./data_for_search/title_and_embedding_matrix/overview_embedding_matrix.pickle","rb") as f:
     overview_embedding_matrix = pickle.load(f)
 
-with open("../../data_for_search/title_and_embedding_matrix/story_embedding_matrix.pickle","rb") as f:
+with open("./data_for_search/title_and_embedding_matrix/story_embedding_matrix.pickle","rb") as f:
     story_embedding_matrix = pickle.load(f)
 
-with open("../../data_for_search/title_and_embedding_matrix/character_embedding_matrix .pickle","rb") as f:
+with open("./data_for_search/title_and_embedding_matrix/character_embedding_matrix .pickle","rb") as f:
     character_embedding_matrix = pickle.load(f)
 
 # embedding_matrix_list =[overview_embedding_matrix,story_embedding_matrix,character_embedding_matrix ]
 combined_matrix = torch.hstack((overview_embedding_matrix,story_embedding_matrix,character_embedding_matrix ))
 
-def create_sililarmanga_list(title:str,num:int):
+del overview_embedding_matrix
+gc.collect()
+del story_embedding_matrix
+gc.collect()
+del character_embedding_matrix
+gc.collect()
+
+# メモリ解放
+
+
+def create_sililar_contents_list(title:str,num:int):
     title_index = title_list.index(title)
     repeat_matrix = combined_matrix [title_index].repeat((combined_matrix .shape[0],1)) #取り出したベクトルを縦方向にリピートしている
     mul_matrix = torch.mul(combined_matrix ,repeat_matrix) #アダマール積を計算している
@@ -95,19 +96,22 @@ def create_sililarmanga_list(title:str,num:int):
     # Converting result to a list
     result_list = result.tolist()
     result_list.pop(0) #はじめは確定で自分だから
-    return_list =[]
-    return_titles = [] #重複を消去するために使用
-    for result in result_list:
-        if len(return_titles)>num+1:break
+    similar_contents_dict  = {"manga":[],"anime":[],"novel":[]}
 
+    for index, result in enumerate(result_list):
         title = title_list[result]
-        if title in return_titles:continue
-        else: return_titles.append(title)
+        media_types = info_for_search_dict[title]["media_types"]
+        # print(media_types)
         year = manga_title_dict[title][0]
-        url =  "/manga_page?title=" + encode_filename(title) +"&year=" + str(year)
         img_url = manga_title_dict[title][3]
-        return_list.append({"title":title,"url":url,"img_url":img_url})
-    return return_list
+        url =  "/manga_page?title=" + encode_filename(title) +"&year=" + str(year)
+        data  ={"title":title,"url":url,"img_url":img_url}
+        if media_types["manga"] and len(similar_contents_dict["manga"])<num:similar_contents_dict["manga"].append(data)
+        elif media_types["anime"]and len(similar_contents_dict["anime"])<num:similar_contents_dict["anime"].append(data)
+        elif media_types["novel"]and len(similar_contents_dict["novel"])<num:similar_contents_dict["novel"].append(data)
+        if all([True if len(similar_contents_dict[media_type])>num else False for media_type in similar_contents_dict ]) :break
+
+    return similar_contents_dict
 
 print("似た漫画を出力する部分の読み込み終了！")
 ###################################################################################################
@@ -797,55 +801,21 @@ def create_html(manga_title,soup):
                             """
    
     
-    #次にtableからhtmlを作成する・・・？
-    pattern = r"\[.*?\]|（.*?）|\(.*?\)"
+    #table_dictは作成済みなのでこれをもとになんかいろいろします！
     return_table_dict = {}
-    choice_list = ["ジャンル","作者","出版社","掲載誌","巻数","原作","原案","作画","レーベル","発売","原作","監督","デザイン","放送局","音楽","話数","製作","著者","掲載サイト","連載","配信","制作","パーソナリティ","構成","発売","演出","ディレクター","製作","販売","枚数","発表期間","監修"] #ここを増やせば保存されるカテゴリが増えます
-    for title,table_dict in all_table_dict.items():
-        subtitle_dict = {}
-        for k,v in table_dict.items():
-            k = k.replace("\n","")
-            table_disc  = ""
-            if any( choice_word in k  for choice_word in choice_list) :
-                total_len = len(k)
-                if  any(choice_word in k  for choice_word in ["巻数","話数","製作","発売日","期間","回数","配信日","フォーマット","枚数","期間"]) or any("#"in a for a in v) or any("放送局"in a for a in v) :
-                    for table_categoriy in v:
-                        table_categoriy = re.sub(pattern, "", table_categoriy)
-                        total_len += len(table_categoriy) #tableの横の長さをここで決める。
-                        if total_len > 15: 
-                            table_disc+= ( table_categoriy +",<br>" )
-                            total_len = 0
-                        else: table_disc+= ( table_categoriy + ",")
+    for title,table_dict in manga_title_dict[decode_filename(manga_title)][6].items():
+        subtitle_dict ={}
+        for subtitle,text in table_dict.items():
+            subtitle_dict[subtitle] =""
+            for t in text:
+                if  any(choice_word in subtitle  for choice_word in ["巻数","話数","製作","発売日","期間","回数","配信日","フォーマット","枚数","期間"]) or any("#"in a for a in text) or any("放送局"in a for a in text) :
+                    subtitle_dict[subtitle]+= f'{t},'
                 else:
-                    
-                    
-                    
-                    #wikiのページによっては正しく分割できていない時があるのでその対策をする([1]や（原作）や、 といったものが入っている場合がある！)
-                    table_categoriy_buff = []
-                    for table_categoriy in v:
-                        table_categoriy_buff += table_categoriy.split("、")
-                    
-                    v = table_categoriy_buff
-                    #次に[1],[2]などを分割
-                    table_categoriy_buff = []
-                    for table_categoriy in v:
-                        replaced_str = re.sub(pattern, ",", table_categoriy)
-                        table_categoriy_buff+= replaced_str.split(",")# カンマで分割して配列を作成
-                        # print(table_categoriy_buff)
-                    if '' in table_categoriy_buff:table_categoriy_buff = table_categoriy_buff[:-1]
-                    v = table_categoriy_buff
-
-                    table_categoriy_buff = []
-                    print(v)
-                    for table_categoriy in v:
-                        total_len += len(table_categoriy) #tableの横の長さをここで決める。
-                        if total_len > 13: 
-                            table_disc+= f'<a href="/search_by_category?category=info:{table_categoriy}">{table_categoriy}</a>,<br>'
-                            total_len =0
-                        else: table_disc+= f'<a href="/search_by_category?category=info:{table_categoriy}">{table_categoriy}</a>,'
-
-                subtitle_dict[k] = table_disc
-            return_table_dict[title] = subtitle_dict
+                    subtitle_dict[subtitle]+= f'<a href="/search_by_category?category=info:{t}">{t}</a>,'
+        
+        return_table_dict[title] = subtitle_dict
+            
+  
 
 
     h2_html.replace("<p></p>","") #なぜかできてしまうこれを消す
@@ -858,7 +828,7 @@ def create_html(manga_title,soup):
 
 def create_descrption_from_title(title:str,year:int):
     title = encode_filename(title) #タイトルをwindowsで扱えるものに変換する
-    with open("./manga_wiki_html/" +str(year)+"/"+ title+".pickle","rb") as f:
+    with open("data_for_search/main_wiki_html/" +str(year)+"/"+ title+".pickle","rb") as f:
         #ダイレクトにアクセスする！！！
         res = pickle.load(f)
     
@@ -875,7 +845,7 @@ def create_descrption_from_title(title:str,year:int):
 def return_manga_info(title:str,year:int):
     # for t in manga_title_dict[title]:
     #     print(t)
-    year,wiki_url,amazon_url,img_url,_ = manga_title_dict[title]
+    year,wiki_url,amazon_url,img_url,_,genre,_ = manga_title_dict[title]
     info ={}
     info["title"] =title
     
@@ -889,23 +859,15 @@ def return_manga_info(title:str,year:int):
     info["categories"]=desc["categories"]
     info['table_dict'] = desc['table_dict']
 
-    similar_manga_list = create_sililarmanga_list(title,num=10) #似た漫画をここで検索する
-    info['similar_manga_list'] = similar_manga_list 
+    similar_contents_dict = create_sililar_contents_list(title,num=10) #似た漫画をここで検索する
+    info['similar_manga_list'] = similar_contents_dict["manga"] 
+    info['similar_novel_list'] = similar_contents_dict["novel"] 
+    info['similar_anime_list'] = similar_contents_dict["anime"] 
     
-    info["genre"] = None
-    try:
-        for title,v in info["table_dict"].items():
-            for subtitle,disc in v.items():
-                # print(subtitle)
-                if "ジャンル" in subtitle:
-                    # print("aaaaaaaaaaa")
-                    # print(disc)
-                    info["genre"] = disc
-                    info["table_dict"].pop(title)
-                    break
-            if info["genre"]:break #ジャンルを取得できたらbreak
-    except:
-        info["genre"] = ""
+    genre_text = ""
+    for g in genre:genre_text+=f'<a href="/search_by_category?category=info:{g}">{g}</a>,'
+    info["genre"] = genre_text
+
     return info
 
 ###################################################################################################
@@ -929,7 +891,7 @@ def create_query_from_input(user_input):
     return return_list
 
 
-from .データベース作成.c3_add_infos_for_search import gpt_async_create_embedding_query as aceq
+from データベース作成.c3_add_infos_for_search import gpt_async_create_embedding_query as aceq
 
 #input_text = ""の場合はその部分の処理をしないことにする（シンプルに時間がかかるしお金もかかるめんどいところなので！）
 def search_database(input_word,
@@ -1024,8 +986,9 @@ def search_database(input_word,
         # 検索用の文字列をベクトル化
         
         query = openai.embeddings.create(
-            model='text-embedding-ada-002',
-            input=query_text
+            model='text-embedding-3-small',
+            input=query_text,
+            dimensions= 512,
         )
 
         query = query.data[0].embedding
@@ -1204,9 +1167,14 @@ def search_database(input_word,
              #入力は空だがカテゴリが選択されている場合はマッチしたものを全て100%として出力する
                 results.append({'title':title,'similarity':100})
           
-       
- 
-            
+    
+    #無理やり同じ文字が入っていた場合は大きく見せる
+    for index, r in enumerate(results):
+        title = r["title"]
+        similarity = r["similarity"]
+        if query_text in title or query_text in title.replace("・",""):
+            results[index]["similarity"]+=1
+
 
 
 

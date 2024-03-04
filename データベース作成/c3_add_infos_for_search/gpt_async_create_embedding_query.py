@@ -2,7 +2,6 @@ import aiohttp
 import asyncio
 import json
 import os
-import openai
 from openai import OpenAI
 import nest_asyncio
 nest_asyncio.apply()

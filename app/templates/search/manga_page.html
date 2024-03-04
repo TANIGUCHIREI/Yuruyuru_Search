@@ -143,29 +143,96 @@
   {% endif %}
 
   <hr size="5">
-  <h2 style="text-align:center">似ている漫画</h2>
-  <div class="similar-manga-table">
-    <table>
-      {% for manga in info['similar_manga_list']|batch(2, '&nbsp;') %}
-      <tr>
-          {% for item in manga %}
-          <td width="50%">
-              <div class="manga-item">
-                  <a href="{{ item.url }}">
-                      {% if item.img_url %}
-                      <img src="{{ item.img_url }}" alt="{{ item.title }}">
-                      {% else %}
-                      <img src="{{ url_for('static', filename='images/no_image_tate.jpg') }}" alt="No image available">
-                      {% endif %}
-                      <div class="manga-title">{{ item.title }}</div>
-                  </a>
-              </div>
-          </td>
-          {% endfor %}
-      </tr>
-      {% endfor %}
-  </table>
+
+  <div id="sections-container" class="table_list-container">
+    <button class="scroll-btn prev" onclick="scrollSection(-1)">&#10094;</button>
+    <button class="scroll-btn next" onclick="scrollSection(1)">&#10095;</button>
+    <div class="sections-wrapper">
+      <section class="area">
+        <h2 style="text-align:center; text-decoration:underline;">似ている漫画</h2>
+        <div class="similar-manga-table">
+          <table>
+            {% for manga in info['similar_manga_list']|batch(2, '&nbsp;') %}
+            <tr>
+                {% for item in manga %}
+                <td width="50%">
+                    <div class="manga-item">
+                        <a href="{{ item.url }}">
+                            {% if item.img_url %}
+                            <img src="{{ item.img_url }}" alt="{{ item.title }}">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='images/no_image_tate.jpg') }}" alt="No image available">
+                            {% endif %}
+                            <div class="manga-title">{{ item.title }}</div>
+                        </a>
+                    </div>
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+      </div>
+      </section>
+
+
+      <section class="area">
+        <h2 style="text-align:center; text-decoration:underline;">似ているアニメ</h2>
+        <div class="similar-manga-table">
+          <table>
+            {% for anime in info['similar_anime_list']|batch(2, '&nbsp;') %}
+            <tr>
+                {% for item in anime %}
+                <td width="50%">
+                    <div class="manga-item">
+                        <a href="{{ item.url }}">
+                            {% if item.img_url %}
+                            <img src="{{ item.img_url }}" alt="{{ item.title }}">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='images/no_image_tate.jpg') }}" alt="No image available">
+                            {% endif %}
+                            <div class="manga-title">{{ item.title }}</div>
+                        </a>
+                    </div>
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+      </div>
+      </section>
+
+
+      <section class="area">
+        <h2 style="text-align:center; text-decoration:underline;">似ている小説</h2>
+        <div class="similar-manga-table">
+          <table>
+            {% for novel in info['similar_novel_list']|batch(2, '&nbsp;') %}
+            <tr>
+                {% for item in novel %}
+                <td width="50%">
+                    <div class="manga-item">
+                        <a href="{{ item.url }}">
+                            {% if item.img_url %}
+                            <img src="{{ item.img_url }}" alt="{{ item.title }}">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='images/no_image_tate.jpg') }}" alt="No image available">
+                            {% endif %}
+                            <div class="manga-title">{{ item.title }}</div>
+                        </a>
+                    </div>
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+      </div>
+      </section>
+
+    </div>
 </div>
+
+
+  
   
   <hr size="5">
   <h2 style="text-align:center">関連カテゴリ</h2>
