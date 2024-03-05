@@ -1072,6 +1072,8 @@ def search_database(input_word,
             title = title_list[index]
             if query_text in title or query_text.lower().replace("　","").replace(" ","").replace("・","") in title.lower().replace("　","").replace(" ","").replace("・",""):
                 sum[index]+=0.3
+            elif any([query_text in category for category in manga_title_dict[title][8]]):
+                sum[index]+=0.2 #この処理はかなり重いかもしれない...
 
         _, result = torch.sort(sum, descending=True)
         # Converting result to a list
