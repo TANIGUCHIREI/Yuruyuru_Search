@@ -1,6 +1,21 @@
 {% extends 'base.html' %}
 
 {% block header %}
+
+<div style="text-align: center;">
+  {% if info["media_types"]["manga"] %}
+  <a style="border-radius: 5px;background: #37d118;padding: 5px;color: #FFF;">漫画</a>
+  {% endif %}
+  {% if info["media_types"]["anime"] %}
+  <a style="border-radius: 5px;background: #ff6f6f;padding: 5px;color: #FFF;">アニメ</a>
+  {% endif %}
+  {% if info["media_types"]["novel"] %}
+  <a style="border-radius: 5px;background: #6fa1ff;padding: 5px;color: #FFF;">小説</a>
+  {% endif %}
+</div>
+ 
+
+
 {% if info["title"] %}
 <div>
   <h4>{% block title %}{{ info["title"] }}{% endblock %}</h4>
@@ -29,6 +44,13 @@
   scroll-behavior: smooth;
 }
 
+.similar_sections-wrapper {
+  display: flex;
+  flex-wrap: nowrap; /* セクションが横に並ぶように設定 */
+  overflow-x: auto;
+  scroll-behavior: smooth;
+}
+
 .area {
   flex: 0 0 auto;
   width: 90vw; /* 各セクションの幅をビューポートの幅に設定 */
@@ -36,15 +58,35 @@
   box-sizing: border-box;
 }
 
+.similar_area {
+  flex: 0 0 auto;
+  width: 90vw; /* 各セクションの幅をビューポートの幅に設定 */
+  padding: 0px;
+  box-sizing: border-box;
+}
+
 .scroll-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background-color: #ddd;
+  background-color: #dbffe1;
   border: none;
   cursor: pointer;
   z-index: 10;
   height: 100px;
+}
+
+.similar_scroll-btn {
+  position: absolute;
+  top: 2%;
+  transform: translateY(-50%);
+  background-color: #dbffe1;
+  border: none;
+  cursor: pointer;
+  z-index: 10;
+  height: 50px;
+  width: 50px;
+  border-radius: 50%;
 }
 
 .prev {
@@ -52,6 +94,14 @@
 }
 
 .next {
+  right: 0px;
+}
+
+.similar_prev {
+  left: 0px;
+}
+
+.similar_next {
   right: 0px;
 }
 
@@ -145,10 +195,10 @@
   <hr size="5">
 
   <div id="sections-container" class="table_list-container">
-    <button class="scroll-btn prev" onclick="scrollSection(-1)">&#10094;</button>
-    <button class="scroll-btn next" onclick="scrollSection(1)">&#10095;</button>
-    <div class="sections-wrapper">
-      <section class="area">
+    <button class="similar_scroll-btn similar_prev" onclick="similar_scrollSection(-1)">&#10094;</button>
+    <button class="similar_scroll-btn similar_next" onclick="similar_scrollSection(1)">&#10095;</button>
+    <div class="similar_sections-wrapper">
+      <section class="similar_area">
         <h2 style="text-align:center; text-decoration:underline;">似ている漫画</h2>
         <div class="similar-manga-table">
           <table>
@@ -175,9 +225,9 @@
       </section>
 
 
-      <section class="area">
+      <section class="similar_area">
         <h2 style="text-align:center; text-decoration:underline;">似ているアニメ</h2>
-        <div class="similar-manga-table">
+        <div class="similar-anime-table">
           <table>
             {% for anime in info['similar_anime_list']|batch(2, '&nbsp;') %}
             <tr>
@@ -202,9 +252,9 @@
       </section>
 
 
-      <section class="area">
+      <section class="similar_area">
         <h2 style="text-align:center; text-decoration:underline;">似ている小説</h2>
-        <div class="similar-manga-table">
+        <div class="similar-novel-table">
           <table>
             {% for novel in info['similar_novel_list']|batch(2, '&nbsp;') %}
             <tr>
@@ -396,4 +446,126 @@ function updateArrowVisibility() {
 </script>
 
 
+
+
+
+
+<!-- ここからは上記jsのコピペ、似ている作品用のもの -->
+<script>
+  //以下は任意の点にスクロールした後に最も近いsectionに移るためのもの
+
+  
+  let similar_sectionisScrolling;
+let similar_section_disableAutoScrollAdjustment = false;
+
+document.addEventListener('DOMContentLoaded', function() {
+  similar_updateArrowVisibility(); // ページ読み込み時に矢印の可視性を更新
+});
+
+
+document.querySelector('.similar_sections-wrapper').addEventListener('scroll', function() {
+  if (similar_section_disableAutoScrollAdjustment) {
+    return;
+  }
+  similar_updateArrowVisibility(); // スクロール時に矢印の可視性を更新
+
+  window.clearTimeout(similar_sectionisScrolling);
+  similar_sectionisScrolling = setTimeout(function() {
+    const sections = document.querySelectorAll('.similar_area');
+    let closest = null;
+    let closestDist = Infinity;
+    const wrapper = document.querySelector('.similar_sections-wrapper');
+    const wrapperScrollLeft = wrapper.scrollLeft;
+    const wrapperWidth = wrapper.offsetWidth;
+
+    sections.forEach(section => {
+      const sectionX = section.offsetLeft - wrapperScrollLeft + section.offsetWidth / 2 - wrapperWidth / 2;
+      const dist = Math.abs(sectionX);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closest = section;
+      }
+    });
+
+    if (closest) {
+      wrapper.scrollTo({
+        top: 0,
+        left: closest.offsetLeft,
+        behavior: 'smooth'
+      });
+    }
+  }, 150);
+});
+
+function similar_scrollSection(direction) {
+  similar_section_disableAutoScrollAdjustment = true;
+  const container = document.querySelector('.similar_sections-wrapper');
+  const sections = document.querySelectorAll('.similar_area');
+  const currentScroll = container.scrollLeft;
+  let targetIndex = 0;
+
+  // 現在のセクションを見つける
+  for (let i = 0; i < sections.length; i++) {
+    const sectionStart = sections[i].offsetLeft;
+    const sectionEnd = sectionStart + sections[i].offsetWidth;
+    if (currentScroll >= sectionStart && currentScroll < sectionEnd) {
+      targetIndex = i;
+      break;
+    }
+  }
+
+  // 移動方向に応じてターゲットセクションを決定
+  if (direction > 0 && targetIndex < sections.length - 1) {
+    // 右に移動
+    targetIndex++;
+  } else if (direction < 0 && targetIndex > 0) {
+    // 左に移動
+    targetIndex--;
+  }
+
+  // ターゲットセクションへスクロール
+  container.scrollTo({
+    top: 0,
+    left: sections[targetIndex].offsetLeft,
+    behavior: 'smooth'
+  });
+
+  // スムーズスクロールが終了した後にフラグをリセットする
+  container.addEventListener('scroll', function onScroll() {
+    similar_section_disableAutoScrollAdjustment = false;
+    container.removeEventListener('scroll', onScroll);
+  });
+
+  // スムーズスクロールが終了した後にフラグをリセットする
+  container.addEventListener('scroll', function onScroll() {
+    similar_section_disableAutoScrollAdjustment = false;
+    container.removeEventListener('scroll', onScroll);
+    similar_updateArrowVisibility(); // スクロール完了時に矢印の可視性を更新
+  });
+
+}
+
+function similar_updateArrowVisibility() {
+  const container = document.querySelector('.similar_sections-wrapper');
+  const totalScrollWidth = container.scrollWidth;
+  const currentScroll = container.scrollLeft;
+  const containerWidth = container.offsetWidth;
+
+  const prevButton = document.querySelector('.similar_prev');
+  const nextButton = document.querySelector('.similar_next');
+
+  // スクロール位置に基づいてボタンの表示を制御
+  if(currentScroll <= 0) {
+    prevButton.style.display = 'none';
+  } else {
+    prevButton.style.display = 'block';
+  }
+
+  if(currentScroll >= totalScrollWidth - containerWidth) {
+    nextButton.style.display = 'none';
+  } else {
+    nextButton.style.display = 'block';
+  }
+}
+</script>
 {% endblock %}

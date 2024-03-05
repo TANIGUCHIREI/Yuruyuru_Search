@@ -19,7 +19,7 @@ if (document.getElementById('liData').value){
 var form = document.getElementById('searchForm');
 
 const autoCompleteJS = new autoComplete({
-placeHolder: "ジャンルを検索してください",
+placeHolder: "関連カテゴリや声優などを検索してください",
 data: {
 src: full_categoires_list,
 cache: true,

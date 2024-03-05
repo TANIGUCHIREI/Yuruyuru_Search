@@ -9,11 +9,8 @@
 
 <form method="post" action="/search" id="searchForm">
   <div class="checkbox-container">
-    <label for="useGPT" ><span>Use GPT?</span></label>
-    <input type="checkbox" id="useGPT" name="useGPT" {{ 'checked' if  form_info['useGPT'] else ''}}>
-
-    <label for="searchall"><span>すべて検索</span></label>
-    <input type="checkbox" id="searchall" name="searchall" {{ 'checked' if form_info['searchall']  else ''}}>
+    
+    <input type="checkbox" id="searchall" name="searchall" {{ 'checked' if form_info['searchall']  else ''}} hidden>
 
     <label for="toggleSliders">検索の割合を指定</label>
     <input type="checkbox" id="toggleSliders" {{form_info['toggleSliders']}}>
@@ -81,9 +78,24 @@
       <td>
         <div class="progress-container">
           <div class="progress-bar" style="width: {{ result['similarity'] }}%">{{ result['similarity'] }}%</div>
+          
         </div>
       </td>
-      <td>{{ result["started_at"] }}</td>
+      <td>{{ result["started_at"] }}
+        <div style="display: flex;flex-direction:column;padding: 10px;margin: 5px;text-align: center;">
+          {% if result["media_type"]["manga"] %}
+          <a style="border-radius: 5px;background: #37d118;padding: 5px;color: #FFF;">漫</a>
+          <br style='display: block;margin: 5px 0;content: "";'>
+          {% endif %}
+          {% if result["media_type"]["anime"] %}
+          <a style="border-radius: 5px;background: #ff6f6f;padding: 5px;color: #FFF;">ア</a>
+          <br style='display: block;margin: 5px 0;content: "";'>
+          {% endif %}
+          {% if result["media_type"]["novel"] %}
+          <a style="border-radius: 5px;background: #6fa1ff;padding: 5px;color: #FFF;">小</a>
+          {% endif %}
+        </div>
+      </td>
       <td style="text-align: center;">
         <a href="{{ result['amazon_url'] }}" rel="noopener noreferrer" style="text-decoration: none; color: black;">
           <div style="word-wrap: break-word; width: 200px; margin: auto;">

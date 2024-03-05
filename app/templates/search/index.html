@@ -9,11 +9,9 @@
 {% block content %}
   <form method="post" action="/search" id="searchForm">
     <div class="checkbox-container">
-      <label for="useGPT"><span>Use GPT?</span></label>
-      <input type="checkbox" id="useGPT" name="useGPT">
+        
 
-      <label for="searchall"><span>すべて検索</span></label>
-      <input type="checkbox" id="searchall" name="searchall">
+      <input type="checkbox" id="searchall" name="searchall" hidden checked>
 
       <label for="toggleSliders">検索の割合を指定</label>
       <input type="checkbox" id="toggleSliders">
@@ -41,7 +39,7 @@
     <input type="hidden" id="liData" name="liData">
     <div class="autoComplete_container">
       <br>
-      <label >ジャンルの検索方法</label>
+      <label >関連カテゴリ・声優の検索方法</label>
       <br>
       <input type="radio" name="AndOR" value="AND" />AND
       <input type="radio" name="AndOR" value="OR" checked/>OR

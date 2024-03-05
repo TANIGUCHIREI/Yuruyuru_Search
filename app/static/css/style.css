@@ -152,7 +152,7 @@ input[type=submit]:hover {
 /* 全体のフォントと背景色 */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
+  background-color: #ffffff; /*これがバックグラウンドの色*/
   color: #333;
   line-height: 1.6;
 }

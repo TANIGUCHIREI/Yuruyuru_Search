@@ -14,7 +14,10 @@ from use_database4 import search_database,return_manga_info,decode_filename
 with open("./data_for_search/categories_list.pickle","rb") as f:
     category_list = pickle.load(f)
 
+with open("./data_for_search/actor_list.pickle","rb") as f:
+    full_actor_list = pickle.load(f)
 
+category_list +=[ "担当:"+actor for actor in full_actor_list]
 
 bp = Blueprint('search', __name__)
 

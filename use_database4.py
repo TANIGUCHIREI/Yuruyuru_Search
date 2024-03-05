@@ -37,8 +37,8 @@ with open ("./data_for_search/info_for_search_dict.pickle", mode='br') as f:
             if media_data["amazon_img"] !="":
                 amazon_img =media_data["amazon_img"]
                 amazon_url = media_data["amazon_url"]
-        year, title, url,amazon_url,img_url,actors_dict,genre,infobox_dict = data["page_year"], data["page_url"],page_title,amazon_url,amazon_img,data["actor_dict"],data["genre"],data["infobox_dict"]
-        manga_title_dict[page_title] = [year,url,amazon_url,img_url,actors_dict,genre,infobox_dict]
+        year, title, url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories = data["page_year"], data["page_url"],page_title,amazon_url,amazon_img,data["actor_dict"],data["genre"],data["infobox_dict"],data["media_types"],data["categories"]
+        manga_title_dict[page_title] = [year,url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories]
 
         #次にyear_and_data_dictの作成
         try:year_and_data_dict[year].append({"title":page_title,"raw_categories":data["categories"],"actors_dict":data["actor_dict"],"infobox_list":data["infobox_list"]})
@@ -47,8 +47,10 @@ with open ("./data_for_search/info_for_search_dict.pickle", mode='br') as f:
 
 
 
-with open("./data_for_search/categories_list.pickle","rb") as f:
-    full_categories_list = pickle.load(f)
+# with open("./data_for_search/categories_list.pickle","rb") as f:
+#     full_categories_list = pickle.load(f)
+
+
 
 
 ############torchの行列計算に対応したcategory行列を読み込む
@@ -83,15 +85,15 @@ del story_embedding_matrix
 gc.collect()
 del character_embedding_matrix
 gc.collect()
+# gc.collect()でメモリ解放
 
-# メモリ解放
-
+mask_vector = torch.cat([torch.zeros(512), torch.ones(1024)]) #overviewが0のマスク用のベクトル
 
 def create_sililar_contents_list(title:str,num:int):
     title_index = title_list.index(title)
-    repeat_matrix = combined_matrix [title_index].repeat((combined_matrix .shape[0],1)) #取り出したベクトルを縦方向にリピートしている
-    mul_matrix = torch.mul(combined_matrix ,repeat_matrix) #アダマール積を計算している
-    sum = torch.sum(mul_matrix,dim=1)/3 #削減する（合計する）次元を決定している
+    title_vector = combined_matrix[title_index]
+    sum = torch.mm(combined_matrix,title_vector.T.reshape(title_vector.T.shape[0],1)) #torchでの２次元行列のdotはmmを使うらしい
+    sum  = sum.reshape(sum.shape[0])/3 
     _, result = torch.sort(sum, descending=True)
     # Converting result to a list
     result_list = result.tolist()
@@ -198,86 +200,11 @@ def decode_filename(filename):
 import bs4
 from bs4 import BeautifulSoup
 def create_dict_from_wikihtml(manga_title,soup)->dict:
-    category_divs = soup.find_all('div', class_='mw-normal-catlinks')
-
-
-
-    categories = category_divs[-1].find_all('a', href=True) #一番最後のカテゴリdivがいちばん大切だから、結局これだけでいいのでは？
-    categories =  [categories[i].text for i in range(len(categories))]
-    categories.remove('カテゴリ') #これは必要ないので消す
-
-
     main_div:bs4.element.Tag = soup.find("div",class_ ="mw-body-content" )
     pattern = r'\[.*?\]'
     init_table = soup.find("table",class_ ="infobox bordered" )
-    all_table_dict = {}
     if init_table:
-        tr_list = init_table.find_all("tr")
-    
-        for tr in tr_list:
-            if tr.find("tr"):
-                # print("aaa")
-                tr_list.remove(tr) #リゼロの漫画ようにtrの中にさらにtrが入っている場合は処理が面倒になるので消去してしまう
-
-
-        #wikiのてーぶるについて処理・tableの中はtrがたくさん入っていて、trの中にタイトルがth,詳細がtdでさらにtdの中にaが含まれている。tr{th{td[a,a,a,...a]}}の関係
-        index = 0
-        template_note = False
-        
-        while True:
-            if template_note:break
-            th = tr_list[index].find("th") 
-            td = tr_list[index].find("td")
-            if td==None :
-                #tableタイトルだけしかない時
-                if th!=None:
-                    if th.get("colspan") :
-                        #タイトル(濃い紫色)が来た場合
-                        title = th.get_text().replace("\n","")
-                        title = re.sub(pattern, '',title )
-                        # print(f"#######{title}#########")
-                        disc_dict = {}
-                        index+=1
-                        while True:
-                            next_tr = tr_list[index]
-                            next_th = next_tr.find("th") 
-                            next_td = next_tr.find("td")
-                            if not next_th:
-                                if next_td.get("colspan") and next_td.find_all("a") and  any(["テンプレート" in word.get_text() for word in next_td.find_all("a")]):
-                                    template_note = True
-                                    break #テンプレート-ノート（tdにcolspanがある）が来た時はwhileを抜け出す
-                                else:
-                                    index+=1
-                                    continue #タイトルのイメージ画像などが入っている場合は飛ばす
-                            if not next_td and not next_th.get("colspan"):
-                                index+=1
-                                continue #これは「その他の出版社」的な中にliが入ったりするタイプなので飛ばしてしまう
-
-                            if next_th.get("colspan"):
-                                index-=1 #なんかこれしたら正常に動いたぞ
-                                break #次のタイトルが来た時はwhileを抜け出す
-                            
-                            
-                            #これまでの処理で残ったのはsubtitle:discriptionの形のみのはずなので、通常の辞書に格納する処理をする
-                            subtitle = next_th.get_text().replace("\n","")
-                            subtitle = re.sub(pattern, '',subtitle )
-                            a_list = next_td.find_all("a")
-                            a_list = [a_list[i].text.replace("\n","") for i in range(len(a_list)) if a_list[i].text !="" and not re.match(pattern,a_list[i].text)]
-                            if len(a_list)==0:a_list = [next_td.get_text().replace("\n","")]
-                                    
-                            # if "独自研究?" in a_list:a_list.remove("独自研究?") #たまにくるこれは消去する
-                            disc_dict[subtitle] = a_list
-                            index+=1
-                            # print(f"{subtitle}:{disc}")
-                            # print(title)
-                        # print("抜けました")
-                        if len(disc_dict) !=0: all_table_dict[title] = disc_dict #中身が空じゃない時は追加する
-                        
-                        
-            index+=1
-
-
-                    
+      
         init_table.decompose() #一番初めにはテーブルは必要ないので消去する
     elements = main_div.find_all([ 'p','h2', 'h3', 'h4','dd','dt','ul','table','div',"dl",'h5']) #ここのdlを消してもそれなりには動作します
     
@@ -709,7 +636,7 @@ def create_dict_from_wikihtml(manga_title,soup)->dict:
             h2_list.append(h3_list[index])#そのまま代入する
             index+=1    
 
-    return {"h2_list":h2_list,"categories":categories,"table_dict":all_table_dict}
+    return {"h2_list":h2_list}
 
 
 
@@ -780,9 +707,6 @@ def create_details(manga_title,h2_title,parent_title,state,input_list)->str:
 def create_html(manga_title,soup):
     result = create_dict_from_wikihtml(manga_title,soup)
     h2_list = result["h2_list"]
-    categories = result["categories"]
-    all_table_dict = result["table_dict"]
-
     h2_html = ""
     for index, h2 in enumerate(h2_list):
         if index==0:detais = '<details class="details is-opened" open>' 
@@ -820,7 +744,7 @@ def create_html(manga_title,soup):
 
     h2_html.replace("<p></p>","") #なぜかできてしまうこれを消す
 
-    return  {"h2_html":h2_html,"categories":categories,"table_dict":return_table_dict}
+    return  {"h2_html":h2_html,"table_dict":return_table_dict}
 
 
 
@@ -834,8 +758,7 @@ def create_descrption_from_title(title:str,year:int):
     
     soup = BeautifulSoup(res, 'html.parser')
     html_parts_list = create_html(title ,soup)
-    categories = [[category,encode_filename(category)]for category in html_parts_list["categories"]] 
-    return {"h2_html":html_parts_list["h2_html"],"categories":categories,"table_dict":html_parts_list["table_dict"]}
+    return {"h2_html":html_parts_list["h2_html"],"table_dict":html_parts_list["table_dict"]}
 
 ###################################################################################################
 
@@ -845,19 +768,18 @@ def create_descrption_from_title(title:str,year:int):
 def return_manga_info(title:str,year:int):
     # for t in manga_title_dict[title]:
     #     print(t)
-    year,wiki_url,amazon_url,img_url,_,genre,_ = manga_title_dict[title]
+    year,url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories = manga_title_dict[title]
     info ={}
     info["title"] =title
     
     info["year"] =year
-    info["wiki_url"] =wiki_url
+    info["wiki_url"] =url
     info["amazon_url"] = amazon_url
     info["img_url"] =img_url
-
     desc = create_descrption_from_title(title,year)
     info["h2_html"] = desc["h2_html"]
-    info["categories"]=desc["categories"]
-    info['table_dict'] = desc['table_dict']
+    info["categories"]=[[category,encode_filename(category)]for category in categories] 
+    info['table_dict'] = desc["table_dict"]
 
     similar_contents_dict = create_sililar_contents_list(title,num=10) #似た漫画をここで検索する
     info['similar_manga_list'] = similar_contents_dict["manga"] 
@@ -867,6 +789,8 @@ def return_manga_info(title:str,year:int):
     genre_text = ""
     for g in genre:genre_text+=f'<a href="/search_by_category?category=info:{g}">{g}</a>,'
     info["genre"] = genre_text
+
+    info["media_types"] = media_types
 
     return info
 
@@ -1141,13 +1065,22 @@ def search_database(input_word,
         repeat_matrix = repeat_query.repeat((combined_matrix .shape[0],1)) #取り出したベクトルを縦方向にリピートしている
         mul_matrix = torch.mul(combined_matrix ,repeat_matrix) #アダマール積を計算している
         sum = torch.sum(mul_matrix,dim=1) #削減する（合計する）次元を決定している
+        
+
+        #無理やり同じ文字が入っていた場合は大きく見せる
+        for index, similarity in enumerate(sum):
+            title = title_list[index]
+            if query_text in title or query_text.lower().replace("　","").replace(" ","").replace("・","") in title.lower().replace("　","").replace(" ","").replace("・",""):
+                sum[index]+=0.3
+
         _, result = torch.sort(sum, descending=True)
         # Converting result to a list
         result_list = result.tolist()
         return_list =[]
         for result in result_list:
             title = title_list[result]
-            similarity = float(sum[result_list[0]])
+            similarity = float(sum[result])
+            # print(similarity)
             if  input_categories!=None:
                 #入力があり、かつカテゴリが選択されている場合
                 # print(title)
@@ -1168,12 +1101,7 @@ def search_database(input_word,
                 results.append({'title':title,'similarity':100})
           
     
-    #無理やり同じ文字が入っていた場合は大きく見せる
-    for index, r in enumerate(results):
-        title = r["title"]
-        similarity = r["similarity"]
-        if query_text in title or query_text in title.replace("・",""):
-            results[index]["similarity"]+=1
+    
 
 
 
@@ -1229,6 +1157,7 @@ def search_database(input_word,
                 "amazon_url":amazon_url,
                 "img_url":img_url,
                 "character":character,
+                "media_type":manga_title_dict[title][7],
                 "character_id":encode_filename(character) #characterの名前はエンコードして送信！
             })
             # print(character)
@@ -1239,7 +1168,8 @@ def search_database(input_word,
             "similarity": round(result["similarity"] * 100, 1),
             "url": url,
             "amazon_url":amazon_url,
-            "img_url":img_url
+            "img_url":img_url,
+            "media_type":manga_title_dict[title][7],
         })
 
     if query_text =="":
