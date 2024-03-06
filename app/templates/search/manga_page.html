@@ -111,7 +111,10 @@
 <div class="about_manga_container">
   <a class="manga_img"><img src="{{ info['img_url'] }}"></a>
 
-  <p><b>ジャンル:</b>{{ info["genre"] | safe }}</p>
+  {% if info["genre"]!="" %} <p><b>ジャンル:</b>{{ info["genre"] | safe }}</p> {% endif %}
+  {% if info["theme"]!="" %}<p><b>題材:</b>{{ info["theme"] | safe }}</p>{% endif %}
+  {% if info["place"]!="" %}<p><b>舞台:</b>{{ info["place"] | safe }}</p>{% endif %}
+  {% if info["protagonist"]!="" %}<p><b>主人公の属性:</b>{{ info["protagonist"] | safe }}</p>{% endif %}
   
   <!-- <p> <b>発表年</b>:{{info['year']}}年</p> -->
   <div id="sections-container" class="table_list-container">
