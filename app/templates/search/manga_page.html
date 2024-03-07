@@ -197,7 +197,7 @@
 
   <hr size="5">
 
-  <div id="sections-container" class="table_list-container">
+  <div id="sections-container" class="table_list-container" >
     <button class="similar_scroll-btn similar_prev" onclick="similar_scrollSection(-1)">&#10094;</button>
     <button class="similar_scroll-btn similar_next" onclick="similar_scrollSection(1)">&#10095;</button>
     <div class="similar_sections-wrapper">
@@ -216,7 +216,7 @@
                             {% else %}
                             <img src="{{ url_for('static', filename='images/no_image_tate.jpg') }}" alt="No image available">
                             {% endif %}
-                            <div class="manga-title">{{ item.title }}</div>
+                            <div class="manga-title" style="color:black">{{ item.title }}</div>
                         </a>
                     </div>
                 </td>
@@ -243,7 +243,7 @@
                             {% else %}
                             <img src="{{ url_for('static', filename='images/no_image_tate.jpg') }}" alt="No image available">
                             {% endif %}
-                            <div class="manga-title">{{ item.title }}</div>
+                            <div class="manga-title" style="color:black">{{ item.title }}</div>
                         </a>
                     </div>
                 </td>
@@ -270,7 +270,7 @@
                             {% else %}
                             <img src="{{ url_for('static', filename='images/no_image_tate.jpg') }}" alt="No image available">
                             {% endif %}
-                            <div class="manga-title">{{ item.title }}</div>
+                            <div class="manga-title" style="color:black">{{ item.title }}</div>
                         </a>
                     </div>
                 </td>

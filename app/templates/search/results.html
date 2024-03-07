@@ -55,7 +55,8 @@
   <input type="hidden" id="liData" name="liData" value={{','.join(categories) if categories else ''}}>
   <div class="autoComplete_container">
     <br>
-    <label >ジャンルの検索方法</label>
+    <br>
+    <label >関連カテゴリ</label>
     <br>
     <input type="radio" name="AndOR" value="AND" {{ 'checked' if form_info['AndOR'] == 'AND' else '' }}  />AND
     <input type="radio" name="AndOR" value="OR" {{ 'checked' if form_info['AndOR'] == 'OR' else '' }} />OR
@@ -70,7 +71,7 @@
 
   </div>
 
-  <textarea id="inputText" name="inputText" rows="4" placeholder="検索したい質問の要素を入力してください" required>{{input_text}}</textarea>
+  <textarea id="inputText" name="inputText" rows="4" placeholder="なんでも入力どうぞ" required>{{input_text}}</textarea>
   <!-- <input type="type" id="inputText" name="inputText" placeholder="検索したい質問の要素を入力してください" required> -->
 
   <input type="submit" value="検索">

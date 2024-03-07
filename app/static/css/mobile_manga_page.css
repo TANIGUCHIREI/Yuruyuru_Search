@@ -137,3 +137,14 @@
     /* width:100px; */
     margin: 0 auto;
 }
+
+a{
+    color: #0000EE; /*これで一度訪れたリンクでも色が同じになる*/
+    /* text-decoration: none; */
+}
+ 
+
+a:visited{
+    color: #0000EE; /*これで一度訪れたリンクでも色が同じになる*/
+}
+

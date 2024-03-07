@@ -41,8 +41,8 @@ with open ("./data_for_search/info_for_search_dict.pickle", mode='br') as f:
         page_title_dict[page_title] = [year,url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories,theme,protagonist,place]
 
         #次にyear_and_data_dictの作成
-        try:year_and_data_dict[year].append({"title":page_title,"raw_categories":data["categories"],"actors_dict":data["actor_dict"],"infobox_list":data["infobox_list"],"theme_list":data["theme_list"],"protagonist_list":data["protagonist_list"],"place_list":data["place_list"]})
-        except: year_and_data_dict[year] = [{"title":page_title,"raw_categories":data["categories"],"actors_dict":data["actor_dict"],"infobox_list":data["infobox_list"],"theme_list":data["theme_list"],"protagonist_list":data["protagonist_list"],"place_list":data["place_list"]}]
+        try:year_and_data_dict[year].append({"title":page_title,"raw_categories":data["categories"],"actors_dict":data["actor_dict"],"infobox_list":data["infobox_list"],"theme_list":data["theme_list"],"protagonist_list":data["protagonist_list"],"place_list":data["place_list"],"genre":data["genre"]})
+        except: year_and_data_dict[year] = [{"title":page_title,"raw_categories":data["categories"],"actors_dict":data["actor_dict"],"infobox_list":data["infobox_list"],"theme_list":data["theme_list"],"protagonist_list":data["protagonist_list"],"place_list":data["place_list"],"genre":data["genre"]}]
 
 
 
@@ -787,7 +787,7 @@ def return_manga_info(title:str,year:int):
     info['similar_anime_list'] = similar_contents_dict["anime"] 
     
     genre_text = ""
-    for g in genre:genre_text+=f'<a href="/search_by_category?category=info:{g}">{g}</a>,' #encodeしなくてもいいのかはわからん
+    for g in genre:genre_text+=f'<a href="/search_by_category?category=ジャンル:{g}">{g}</a>,' #encodeしなくてもいいのかはわからん
     info["genre"] = genre_text
 
     theme_text = ""
@@ -1002,8 +1002,8 @@ def search_database(input_word,
             elif "info:" in category:
                 input_infobox_list.append(category.replace("info:","")) #ここに追加する
                 input_categories.remove(category) #ここからは消す
-            elif "題材:" in category:
-                input_theme_list.append(category.replace("題材:","")) #ここに追加する
+            elif "題材:" in category or "ジャンル:" in category:
+                input_theme_list.append(category.replace("題材:","").replace("ジャンル:","")) #ここに追加する
                 input_categories.remove(category) #ここからは消す
             elif "主人公の属性:" in category:
                 input_protagonist_list.append(category.replace("主人公の属性:","")) #ここに追加する
@@ -1024,6 +1024,7 @@ def search_database(input_word,
                 protagonist_list = data["protagonist_list"]
                 place_list = data["place_list"]
                 page_title = data["title"]
+                genre_list = data["genre"]
                 if not any( [ True if page_title_dict[page_title][7][type_] else False for type_ in input_media_types]):continue #検索条件にヒットしない場合は除外する！
                 True_or_False_list = []
                 #まずは通常のカテゴリの処理
@@ -1050,7 +1051,7 @@ def search_database(input_word,
 
                 #題材の処理
                 if input_theme_list!=[]:
-                    if  all(info in theme_list for info in input_theme_list):
+                    if  all(info in theme_list or info in genre_list for info in input_theme_list):
                         True_or_False_list.append(True)
                     else:True_or_False_list.append(False)
                 else:True_or_False_list.append(True) #removeされた結果何もないのならとりあえずTrueにしておく]
@@ -1081,6 +1082,7 @@ def search_database(input_word,
                 protagonist_list = data["protagonist_list"]
                 place_list = data["place_list"]
                 page_title = data["title"]
+                genre_list = data["genre"]
                 if not any( [ True if page_title_dict[page_title][7][type_] else False for type_ in input_media_types]):continue #検索条件にヒットしない場合は除外する！
                 True_or_False_list = []
                 True_or_False_list = []
@@ -1116,7 +1118,7 @@ def search_database(input_word,
 
                   #題材の処理
                 if input_theme_list!=[]:
-                    if  any(info in theme_list for info in input_theme_list):
+                    if  any(info in theme_list or info in genre_list for info in input_theme_list):
                         True_or_False_list.append(True)
                     else:True_or_False_list.append(False)
                 else:True_or_False_list.append(False) #removeされた結果何もないのならとりあえずTrueにしておく]

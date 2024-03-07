@@ -24,7 +24,7 @@
 <body>
   <nav>
     <img src="{{ url_for('static', filename='images/book-4986.svg') }}" width="2px" height="2px">
-    <h1><a href="/">ゆるゆる検索（仮)</a></h1>
+    <h1 ><a href="/" style="color:black">ゆるゆる検索（仮)</a></h1>
   </nav>
 
   <div class="container">
@@ -43,10 +43,10 @@
 
   <footer>
     <ul>
-      <li><a href="/">ホーム</a></li>
-      <li><a href="{{ url_for('nav.aboutsite')}}">サイトについて</a></li>
-      <li><a href="{{ url_for('nav.sitepolicy')}}">サイトポリシー</a></li>
-      <li><a href="{{ url_for('nav.contact')}}">お問い合わせ</a></li>
+      <li><a href="/" style="color:black">ホーム</a></li>
+      <li><a href="{{ url_for('nav.aboutsite')}}" style="color:black">サイトについて</a></li>
+      <li><a href="{{ url_for('nav.sitepolicy')}}" style="color:black">サイトポリシー</a></li>
+      <li><a href="{{ url_for('nav.contact')}}" style="color:black">お問い合わせ</a></li>
     </ul>
     <small>&copy; 2023 Managa Search</small>
   </footer>
