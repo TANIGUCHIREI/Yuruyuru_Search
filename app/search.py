@@ -25,7 +25,7 @@ bp = Blueprint('search', __name__)
 
 @bp.route('/', methods=['GET'])
 def index():
-    return render_template('search/index.html',full_categories_list=category_list)
+    return render_template('search/index.html',full_categories_list=category_list,start_year=1900, end_year=2024)
 
 @bp.route('/search', methods=['GET', 'POST'])
 def search():
