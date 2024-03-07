@@ -8,31 +8,48 @@
 </script>
 
 <form method="post" action="/search" id="searchForm">
-  <div class="checkbox-container">
-    
-    <input type="checkbox" id="searchall" name="searchall" {{ 'checked' if form_info['searchall']  else ''}} hidden>
+    <div class="checkbox-container">
+      
+      <div class="select-year-container" style="display: flex; text-align: center;">
+        <select name="start_year">
+            {%for year in range(start_year, end_year)%}
+            <option value="{{year}}">{{year}}</option>
+            {%endfor%}
+        </select>
+        <span>年から</span>
+        <select name="end_year">
+            {%for year in range(end_year, start_year-1, -1)%}
+            <option value="{{year}}">{{year}}</option>
+            {%endfor%}
+        </select>
+        <span>年までの</span>
 
-    <label for="toggleSliders">検索の割合を指定</label>
-    <input type="checkbox" id="toggleSliders" {{form_info['toggleSliders']}}>
+        <input type="hidden" id="start_year" name="start_year">
+        <input type="hidden" id="end_year" name="end_year">
 
-    <label for="story_age_checkbox">作品の年代を指定</label {{ 'checked' if form_info['story_age_checkbox']  else ''}}>
-    <input type="checkbox" id="story_age_checkbox">
-  </div>
+    </div>
+      <div class="media-type-checkbox">
+        <div>
+          <label for="toggleSliders">漫画</label>
+          <input type="checkbox" id="manga" name="manga" {{ 'checked' if form_info['manga'] else '' }} >
+          <label for="toggleSliders">アニメ</label>
+          <input type="checkbox" id="anime" name="anime" {{ 'checked' if form_info['anime'] else '' }}>
+          <label for="toggleSliders">小説</label>
+          <input type="checkbox" id="novel" name="novel" {{ 'checked' if form_info['novel'] else '' }}>
+        </div>
+
+      </div>
+
+      <input type="checkbox" id="searchall" name="searchall" hidden checked>
+
+      <!-- <label for="toggleSliders">検索の割合を指定</label>
+      <input type="checkbox" id="toggleSliders"> -->
+
+      <input type="checkbox" id="story_age_checkbox" hidden>
+
+      </div>
 
   
-
-  <div class="slider_container">
-    <label for="overview_rate"><span class="range_bar">概要</span></label>
-    <input type="range" id="overview_rate" name="overview_rate" min="0" max="100" disabled>
-    <label for="story_rate"><span class="range_bar">ストーリー</span></label>
-    <input type="range" id="story_rate" name="story_rate" min="0" max="100" disabled>
-    <label for="character_rate"><span class="range_bar">キャラクター</span></label>
-    <input type="range" id="character_rate" name="character_rate" min="0" max="100" disabled>
-  </div>
-
-  <div class="range-wrapper">
-    <div id="range"></div>
-  </div>
 
   <!-- フォーム内に隠しフィールドを追加 -->
   <input type="hidden" id="liData" name="liData" value={{','.join(categories) if categories else ''}}>
@@ -109,7 +126,7 @@
         </a>
       </td>
       {% if actor_select %}
-        <td><a href="{{ result['amazon_url'] +'&character_id='+ result["character_id"]}}" >{{result["character"]}}</a></td>
+        <td><div style="width: 100px;"><a href="{{ result['amazon_url'] +'&character_id='+ result["character_id"]}}" >{{result["character"]}}</a></td></div>
       {% endif %}
     </tr>
     {% endfor %}

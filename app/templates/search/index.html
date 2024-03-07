@@ -7,54 +7,7 @@
 {% endblock %}
 
 {% block content %}
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-      const startYearSelect = document.querySelector('select[name="start_year"]');
-      const endYearSelect = document.querySelector('select[name="end_year"]');
-  
-      function updateEndYearOptions() {
-          const selectedStartYear = parseInt(startYearSelect.value);
-          const currentEndYear = parseInt(endYearSelect.value);
-  
-          // 終了年の選択肢をクリアして、新しい範囲を設定
-          endYearSelect.innerHTML = '';
-          for (let year = selectedStartYear+1; year <= 2024; year++) {
-              const option = document.createElement('option');
-              option.value = year;
-              option.textContent = year;
-              if (year === currentEndYear) {
-                  option.selected = true;
-              }
-              endYearSelect.appendChild(option);
-          }
-      }
-  
-      function updateStartYearOptions() {
-          const selectedEndYear = parseInt(endYearSelect.value);
-          const currentStartYear = parseInt(startYearSelect.value);
-  
-          // 開始年の選択肢をクリアして、新しい範囲を設定
-          startYearSelect.innerHTML = '';
-          for (let year = 1900; year < selectedEndYear; year++) {
-              const option = document.createElement('option');
-              option.value = year;
-              option.textContent = year;
-              if (year === currentStartYear) {
-                  option.selected = true;
-              }
-              startYearSelect.appendChild(option);
-          }
-      }
-  
-      // 開始年の選択が変更されたときに終了年の選択肢を更新
-      startYearSelect.addEventListener('change', updateEndYearOptions);
-  
-      // 終了年の選択が変更されたときに開始年の選択肢を更新
-      endYearSelect.addEventListener('change', updateStartYearOptions);
 
-      updateEndYearOptions(); //ロード時に変更してしまう
-  });
-  </script>
   <form method="post" action="/search" id="searchForm">
     <div class="checkbox-container">
       
@@ -71,15 +24,21 @@
             {%endfor%}
         </select>
         <span>年までの</span>
+
+        <input type="hidden" id="start_year" name="start_year">
+        <input type="hidden" id="end_year" name="end_year">
+
     </div>
       <div class="media-type-checkbox">
         <div>
+          <input type="checkbox" id="manga" name="manga" checked>
           <label for="toggleSliders">漫画</label>
-          <input type="checkbox" id="manga" checked>
+          <input type="checkbox" id="anime" name="anime" checked>
           <label for="toggleSliders">アニメ</label>
-          <input type="checkbox" id="manga" checked>
+          
+          <input type="checkbox" id="novel" name="novel" checked>
           <label for="toggleSliders">小説</label>
-          <input type="checkbox" id="manga" checked>
+          
         </div>
 
       </div>

@@ -20,7 +20,7 @@ client = OpenAI(api_key=OPENAI_API_KEY)
 
 
 year_and_data_dict = {}
-manga_title_dict = {}
+page_title_dict = {}
 
 with open ("./data_for_search/info_for_search_dict.pickle", mode='br') as f:
     info_for_search_dict  = pickle.load(f)
@@ -38,7 +38,7 @@ with open ("./data_for_search/info_for_search_dict.pickle", mode='br') as f:
                 amazon_img =media_data["amazon_img"]
                 amazon_url = media_data["amazon_url"]
         year, title, url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories,theme,protagonist,place = data["page_year"], data["page_url"],page_title,amazon_url,amazon_img,data["actor_dict"],data["genre"],data["infobox_dict"],data["media_types"],data["categories"],data["theme_list"],data["protagonist_list"],data["place_list"]
-        manga_title_dict[page_title] = [year,url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories,theme,protagonist,place]
+        page_title_dict[page_title] = [year,url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories,theme,protagonist,place]
 
         #次にyear_and_data_dictの作成
         try:year_and_data_dict[year].append({"title":page_title,"raw_categories":data["categories"],"actors_dict":data["actor_dict"],"infobox_list":data["infobox_list"],"theme_list":data["theme_list"],"protagonist_list":data["protagonist_list"],"place_list":data["place_list"]})
@@ -104,8 +104,8 @@ def create_sililar_contents_list(title:str,num:int):
         title = title_list[result]
         media_types = info_for_search_dict[title]["media_types"]
         # print(media_types)
-        year = manga_title_dict[title][0]
-        img_url = manga_title_dict[title][3]
+        year = page_title_dict[title][0]
+        img_url = page_title_dict[title][3]
         url =  "/manga_page?title=" + encode_filename(title) +"&year=" + str(year)
         data  ={"title":title,"url":url,"img_url":img_url}
         if media_types["manga"] and len(similar_contents_dict["manga"])<num:similar_contents_dict["manga"].append(data)
@@ -727,7 +727,7 @@ def create_html(manga_title,soup):
     
     #table_dictは作成済みなのでこれをもとになんかいろいろします！
     return_table_dict = {}
-    for title,table_dict in manga_title_dict[decode_filename(manga_title)][6].items():
+    for title,table_dict in page_title_dict[decode_filename(manga_title)][6].items():
         subtitle_dict ={}
         for subtitle,text in table_dict.items():
             subtitle_dict[subtitle] =""
@@ -768,7 +768,7 @@ def create_descrption_from_title(title:str,year:int):
 def return_manga_info(title:str,year:int):
     # for t in manga_title_dict[title]:
     #     print(t)
-    year,url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories,theme,protagonist,place = manga_title_dict[title]
+    year,url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories,theme,protagonist,place = page_title_dict[title]
     info ={}
     info["title"] =title
     
@@ -846,6 +846,7 @@ def search_database(input_word,
                     suggest_category_num = 30,
                     return_num = 100,
                     show_result = False,
+                    selecte_media_types = {"manga":True,"anime":True,"novel":True}
                     ):
     
     # print(input_categories)
@@ -936,12 +937,23 @@ def search_database(input_word,
     #ここから検索用のlistを作成する
 
     
+
+
     #まずはyearからデータ範囲を厳選する
+    # print(f"{search_init_year}から{search_final_year}")
+    # print(selecte_media_types)
     full_data_list = []
     for year,data in year_and_data_dict.items():
-        if year <=search_final_year and year > search_init_year:
+        if year <=search_final_year and year >= search_init_year:
             #検索条件に適合していたら
             full_data_list+=data
+ 
+
+    input_media_types = [] #これは後に使います！！
+    for type_ in selecte_media_types:
+        if selecte_media_types[type_]:input_media_types.append(type_) #下の処理で使います。これによりinput_media_types = ["manga","novel"]のようなものが作成される
+
+
 
     #入力から自動カテゴリ選択(入力がある場合は！)
     if Use_Auto_Suggest_Categories and input_categories == None and query_text!="":
@@ -1011,8 +1023,11 @@ def search_database(input_word,
                 theme_list = data["theme_list"]
                 protagonist_list = data["protagonist_list"]
                 place_list = data["place_list"]
+                page_title = data["title"]
+                if not any( [ True if page_title_dict[page_title][7][type_] else False for type_ in input_media_types]):continue #検索条件にヒットしない場合は除外する！
                 True_or_False_list = []
                 #まずは通常のカテゴリの処理
+                
                 if input_categories!=[]:
                     if  all(category in data_categories for category in input_categories):
                         True_or_False_list.append(True)
@@ -1065,7 +1080,8 @@ def search_database(input_word,
                 theme_list = data["theme_list"]
                 protagonist_list = data["protagonist_list"]
                 place_list = data["place_list"]
-
+                page_title = data["title"]
+                if not any( [ True if page_title_dict[page_title][7][type_] else False for type_ in input_media_types]):continue #検索条件にヒットしない場合は除外する！
                 True_or_False_list = []
                 True_or_False_list = []
                 category_count =0
@@ -1140,7 +1156,7 @@ def search_database(input_word,
             title = title_list[index]
             if query_text in title or query_text.lower().replace("　","").replace(" ","").replace("・","") in title.lower().replace("　","").replace(" ","").replace("・",""):
                 sum[index]+=0.3
-            elif any([query_text in category for category in manga_title_dict[title][8]]):
+            elif any([query_text in category for category in page_title_dict[title][8]]):
                 sum[index]+=0.2 #この処理はかなり重いかもしれない...
 
         _, result = torch.sort(sum, descending=True)
@@ -1158,8 +1174,12 @@ def search_database(input_word,
                     return_list.append({"title":title,"similarity":emphasize_category_rate*title_and_match_category_count_dict[title]  + similarity})
                 else: continue #カテゴリが全く関連がない場合はappendしない！
             else:
-                #入力のみが入っている場合
-                return_list.append({"title":title,"similarity":similarity})
+                #入力のみが入っている場合...この場合はyearによるソートのみを行う(行列計算は全てを行うのでもう一度ここでやらなくちゃいけない・・・)
+                year = page_title_dict[title][0]
+                if year <=search_final_year and year >= search_init_year and any( [ True if page_title_dict[title][7][type_] else False for type_ in input_media_types]):
+                    return_list.append({"title":title,"similarity":similarity}) #yearが適しているかどうかを示す
+                else:
+                    continue
 
         # results = sorted(results, key=lambda i: i['similarity'], reverse=True)
         results  = return_list
@@ -1182,10 +1202,10 @@ def search_database(input_word,
         print(f"入力: {input_word}")
         print("検索結果")
         for i, result in enumerate(results):
-            year = manga_title_dict[result["title"]][0]
-            wiki_url =  manga_title_dict[result["title"]][1]
-            amazon_url =manga_title_dict[result["title"]][2]
-            img_url = manga_title_dict[result["title"]][3]
+            year = page_title_dict[result["title"]][0]
+            wiki_url =  page_title_dict[result["title"]][1]
+            amazon_url =page_title_dict[result["title"]][2]
+            img_url = page_title_dict[result["title"]][3]
             category_match_count = None
             if Use_Auto_Suggest_Categories:
                 category_match_count = emphasize_category_rate*title_and_match_category_count_dict[result["title"]]*100
@@ -1208,16 +1228,16 @@ def search_database(input_word,
         title = result["title"]
         if title in return_titles:continue
         else: return_titles.append(title)
-        year = manga_title_dict[title][0]
+        year = page_title_dict[title][0]
         # url =  manga_title_dict[result["title"]][1]
         url =  "/manga_page?title=" + encode_filename(title) +"&year=" + str(year) #argにタイトルを追加している, encode_filenameで文字をエスケープするように変更
         # amazon_url =manga_title_dict[result["title"]][2]
         amazon_url = url
-        img_url = manga_title_dict[title][3]
+        img_url = page_title_dict[title][3]
         if input_actors_list:
             actor =  input_actors_list[0] #初めの人を担当として検索
-            if manga_title_dict[title][4]!={} and  actor in manga_title_dict[title][4]:
-                character = manga_title_dict[title][4][actor] 
+            if page_title_dict[title][4]!={} and  actor in page_title_dict[title][4]:
+                character = page_title_dict[title][4][actor] 
             else: character ="-"
             return_results.append({
                 "title": title,
@@ -1227,7 +1247,7 @@ def search_database(input_word,
                 "amazon_url":amazon_url,
                 "img_url":img_url,
                 "character":character,
-                "media_type":manga_title_dict[title][7],
+                "media_type":page_title_dict[title][7],
                 "character_id":encode_filename(character) #characterの名前はエンコードして送信！
             })
             # print(character)
@@ -1239,7 +1259,7 @@ def search_database(input_word,
             "url": url,
             "amazon_url":amazon_url,
             "img_url":img_url,
-            "media_type":manga_title_dict[title][7],
+            "media_type":page_title_dict[title][7],
         })
 
     if query_text =="":
