@@ -238,22 +238,85 @@ def create_categories(soup)->dict:
     return categories,actor_dict,return_table_list,return_table_dict,genre
 
 
+def create_title_and_authors_data(soup):
+    main_div:bs4.element.Tag = soup.find("div",class_ ="mw-body-content" )
+    elements = main_div.find_all([ 'p','h2']) #ここのdlを消してもそれなりには動作します
+
+    pattern = r'\[.*?\]'
+
+    h2_dict = {}
+    h2_title = "要約"
+    word_buff = ""
+    for element in elements:
+        managed_text = re.sub(pattern, '',element.get_text())
+        if element.name =='h2':
+            # print(f"=========={h2_title}==========")
+            # print(word_buff)
+            h2_dict[h2_title] = word_buff
+            h2_title  = managed_text
+            word_buff = ""
+            continue
+        else:
+            word_buff += managed_text
+        
+        if h2_title!="要約":break #今回使うのは初めのh2のみ！
+    
+    abs_init_text_list = h2_dict["要約"].split("。")
+    init_text = ""
+    for text in abs_init_text_list:
+        text=text.replace("\n","")
+        if "『"in text :
+            if"』"  in text:
+                init_text = text
+                break
+            else:
+                init_text+=text
+        
+        if init_text!="" and "』" in text:
+            #タイトルに。が入っていた場合は区切られてしまう
+            init_text+=text
+            break
+    
+    author_pattern =r"は、.*?による|は.*?による"
+    title_pattern=r"『.*?』"
+    parentheses_pattern = r"\(.*?\)|（.*?）"
+    # title_and_parentheses_pattern=r"『.*?』\(.*?\)|『.*?』（.*?）"
+    init_text=re.sub(title_pattern,"",init_text) #タイトル部分を消す
+    pronounce_text = re.findall(parentheses_pattern,init_text)
+    if pronounce_text!=[]:pronounce_text=pronounce_text[0].replace("(","").replace(")","").replace("（","").replace("）","")
+    # print(pronounce_text)
+    author_text=re.findall(author_pattern,re.sub(parentheses_pattern,"",init_text))
+    if author_text!=[]:author_text=author_text[0].replace("、","").replace("による","")[1:]
+    # print(author_text)
+    return pronounce_text,author_text
+            
+
+
+    
+    
+    # ym_pattern = r"\d+年\d+月|（令和\d+年）|\d+月\d+日|\d+年度|\d+部"
+    # parentheses_list = [text if not  re.findall(ym_pattern,text) else None for text in re.findall(parentheses_pattern,abs_init_text)]
+    
+
 
 
 if __name__ == '__main__':
-    import pickle,re
-    with open("./manga_wiki_html/2020/僕とロボコ.pickle","rb") as f:
-        res = pickle.load(f)
+    import pickle,re,os
+    # print(os.listdir())
+    with open("./データベース作成/manga_wiki_html_data/2020.pickle","rb") as f:
+        pickle_dict = pickle.load(f)
+    for title,res in pickle_dict.items():
+        soup = BeautifulSoup(res, 'html.parser')
         
-    soup = BeautifulSoup(res, 'html.parser')
-    categories,actor_dict,return_table_list,return_table_dict,genre = create_categories(soup)
-    # if '大塚剛央' in actor_dict:
-    #     print(actor_dict['大塚剛央'])
-    for k,v in return_table_dict.items():
+        pronounce_text,author_text=create_title_and_authors_data(soup)
+        print(f"title:{title},pronounce:{pronounce_text},author:{author_text}")
+        
+    # categories,actor_dict,return_table_list,return_table_dict,genre = create_categories(soup)
+    # for k,v in return_table_dict.items():
 
-        print(f"{k} : {v}")
-    print(genre)
-    print(re.split(r"<a.*?>",genre.replace("</a>,",""))[1:]) #この処理で一応genreのhtmlからリスト形式のgenreを取得することができる！
+    #     print(f"{k} : {v}")
+    # print(genre)
+    
     # for v in return_table_list:
 
     #     print(f"{v}")
