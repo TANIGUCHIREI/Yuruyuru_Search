@@ -25,88 +25,10 @@
 {% endblock %}
 {% block content %}
 <script src="{{ url_for('static', filename='js/manga_page.js') }}"></script>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile_manga_page.css') }}?v={{ now() }}" media="screen and (max-width:500px)"> <!-- スマホ画面向け-->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/manga_page.css') }}" media="screen and (min-width:5000px)"> <!--PC画面向け-->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile_manga_page.css') }}?v={{ now() }}" media="screen and (min-width:0px)"> <!-- スマホ画面向け-->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/manga_page.css') }}?v={{ now() }}" media="screen and (min-width:500px)"> <!--PC画面向け-->
 
 
-
-<style>
-.table_list-container {
-  position: relative;
-  overflow: hidden;
-  width: 90vw; /* コンテナの幅をビューポート幅に設定 */
-}
-
-.sections-wrapper {
-  display: flex;
-  flex-wrap: nowrap; /* セクションが横に並ぶように設定 */
-  overflow-x: auto;
-  scroll-behavior: smooth;
-}
-
-.similar_sections-wrapper {
-  display: flex;
-  flex-wrap: nowrap; /* セクションが横に並ぶように設定 */
-  overflow-x: auto;
-  scroll-behavior: smooth;
-}
-
-.area {
-  flex: 0 0 auto;
-  width: 90vw; /* 各セクションの幅をビューポートの幅に設定 */
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-.similar_area {
-  flex: 0 0 auto;
-  width: 90vw; /* 各セクションの幅をビューポートの幅に設定 */
-  padding: 0px;
-  box-sizing: border-box;
-}
-
-.scroll-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background-color: #dbffe1;
-  border: none;
-  cursor: pointer;
-  z-index: 10;
-  height: 100px;
-}
-
-.similar_scroll-btn {
-  position: absolute;
-  top: 2%;
-  transform: translateY(-50%);
-  background-color: #dbffe1;
-  border: none;
-  cursor: pointer;
-  z-index: 10;
-  height: 50px;
-  width: 50px;
-  border-radius: 50%;
-}
-
-.prev {
-  left: 0px;
-}
-
-.next {
-  right: 0px;
-}
-
-.similar_prev {
-  left: 0px;
-}
-
-.similar_next {
-  right: 0px;
-}
-
-
-</style>
 
 <div class="about_manga_container">
   <a class="manga_img"><img src="{{ info['img_url'] }}"></a>
