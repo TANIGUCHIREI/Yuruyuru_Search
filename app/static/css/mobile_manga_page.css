@@ -223,3 +223,7 @@ a:visited{
   .similar_next {
     right: 0px;
   }
+
+  .manga_img_container{
+    text-align: center;
+  }

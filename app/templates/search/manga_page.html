@@ -25,37 +25,40 @@
 {% endblock %}
 {% block content %}
 <script src="{{ url_for('static', filename='js/manga_page.js') }}"></script>
-<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile_manga_page.css') }}?v={{ now() }}" media="screen and (min-width:0px)"> <!-- スマホ画面向け-->
-<link rel="stylesheet" href="{{ url_for('static', filename='css/manga_page.css') }}?v={{ now() }}" media="screen and (min-width:500px)"> <!--PC画面向け-->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/mobile_manga_page.css') }}?v={{ now() }}" media="screen and (min-width:10px) and (max-width:500px)"> <!-- スマホ画面向け-->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/manga_page.css') }}?v={{ now() }}" media="screen and (min-width:501px)"> <!--PC画面向け-->
 
 
 
 <div class="about_manga_container">
-  <a class="manga_img"><img src="{{ info['img_url'] }}"></a>
+  <div class="img_and_info_container">
+    <div class="manga_img_container"><a class="manga_img"><img src="{{ info['img_url'] }}"></a></div>
 
-  {% if info["genre"]!="" %} <p><b>ジャンル:</b>{{ info["genre"] | safe }}</p> {% endif %}
-  {% if info["theme"]!="" %}<p><b>題材:</b>{{ info["theme"] | safe }}</p>{% endif %}
-  {% if info["place"]!="" %}<p><b>舞台:</b>{{ info["place"] | safe }}</p>{% endif %}
-  {% if info["protagonist"]!="" %}<p><b>主人公の属性:</b>{{ info["protagonist"] | safe }}</p>{% endif %}
-  
-  <!-- <p> <b>発表年</b>:{{info['year']}}年</p> -->
-  <div id="sections-container" class="table_list-container">
-    <hr size="5">
-    {% if info["table_dict"]|length > 1 %}
-    <button class="scroll-btn prev" onclick="scrollSection(-1)">&#10094;</button>
-    <button class="scroll-btn next" onclick="scrollSection(1)">&#10095;</button>
-    {% endif %}
-    <div class="sections-wrapper">
-      {% for title, dict_ in info["table_dict"].items() %}
-      <section class="area">
-        <h3 style="text-align:center; text-decoration:underline;">{{ title }}</h3>
-        {% for subtitle, disc in dict_.items() %}
-        <p><b>{{ subtitle }}:</b>{{ disc | safe }}</p>
+    {% if info["genre"]!="" %} <p><b>ジャンル:</b>{{ info["genre"] | safe }}</p> {% endif %}
+    {% if info["theme"]!="" %}<p><b>題材:</b>{{ info["theme"] | safe }}</p>{% endif %}
+    {% if info["place"]!="" %}<p><b>舞台:</b>{{ info["place"] | safe }}</p>{% endif %}
+    {% if info["protagonist"]!="" %}<p><b>主人公の属性:</b>{{ info["protagonist"] | safe }}</p>{% endif %}
+    
+    <!-- <p> <b>発表年</b>:{{info['year']}}年</p> -->
+  </div>
+ 
+    <div id="sections-container" class="table_list-container">
+      <hr size="5">
+      {% if info["table_dict"]|length > 1 %}
+      <button class="scroll-btn prev" onclick="scrollSection(-1)">&#10094;</button>
+      <button class="scroll-btn next" onclick="scrollSection(1)">&#10095;</button>
+      {% endif %}
+      <div class="sections-wrapper">
+        {% for title, dict_ in info["table_dict"].items() %}
+        <section class="area">
+          <h3 style="text-align:center; text-decoration:underline;">{{ title }}</h3>
+          {% for subtitle, disc in dict_.items() %}
+          <p><b>{{ subtitle }}:</b>{{ disc | safe }}</p>
+          {% endfor %}
+        </section>
         {% endfor %}
-      </section>
-      {% endfor %}
-    </div>
-</div>
+      </div>
+  </div>
 
 </div>
 <hr size="5">

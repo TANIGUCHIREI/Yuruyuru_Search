@@ -68,7 +68,7 @@
 
 
 .main_content {
-    width: 700px;
+    width: 800px; /*dtails,関連カテゴリの幅調整*/
     /* height: 50px; */
     /* 水平方向の中央揃え */
     margin: 0 auto;
@@ -98,7 +98,7 @@
 
 
 .about_manga_container{
-    width: 700px;
+    width: 800px; /*画像・info・ジャンルあたりの幅調整*/
     /* height: 50px; */
     /* 水平方向の中央揃え */
     margin: 0 auto;
@@ -109,6 +109,7 @@
   .other-link-container{
     display: flex;
     justify-content: space-around;
+    flex-direction: column;
   }
   
   .manga-item {
@@ -133,7 +134,7 @@
 .table_list-container {
   position: relative;
   overflow: hidden;
-  width: 30vw; /* コンテナの幅をビューポート幅に設定 */
+  width: 400px; /* コンテナの幅をビューポート幅に設定 */
 }
 
 .sections-wrapper {
@@ -152,14 +153,14 @@
 
 .area {
   flex: 0 0 auto;
-  width: 30vw; /* 各セクションの幅をビューポートの幅に設定 */
+  width: 400px; /* 各セクションの幅をビューポートの幅に設定 */
   padding: 20px;
   box-sizing: border-box;
 }
 
 .similar_area {
   flex: 0 0 auto;
-  width: 30vw; /* 各セクションの幅をビューポートの幅に設定 */
+  width: 400px; /* 各セクションの幅をビューポートの幅に設定 */
   padding: 0px;
   box-sizing: border-box;
 }
@@ -203,3 +204,13 @@
 .similar_next {
   right: 0px;
 }
+
+.img_and_info_container{
+    width: 400px;
+}
+.sections-container{
+    width: 400px;
+}
+/* .manga_img_container{
+    text-align: center;
+  } */
