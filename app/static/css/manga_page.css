@@ -78,7 +78,7 @@
     list-style-type: none; /* リストの点を消す */
     margin: 10px; /* マージンで少し間隔を開ける */
     padding: 10px; /* パディングで文字と枠の間隔を開ける */
-    background-color: rgb(211, 236, 186); /* 背景色を緑にする */
+    background-color: #dbffe1; /* 背景色を緑にする */
     color: white; /* 文字色を白にする */
     border-radius: 10px; /* 四隅をラウンドさせる */
     transition: background-color 0.3s; /* 背景色の変化を滑らかにする */
@@ -136,6 +136,11 @@
   overflow: hidden;
   width: 400px; /* コンテナの幅をビューポート幅に設定 */
 }
+.similar_table_list-container {
+    position: relative;
+    overflow: hidden;
+    width: 800px; /* コンテナの幅をビューポート幅に設定 */
+  }
 
 .sections-wrapper {
   display: flex;
@@ -160,7 +165,7 @@
 
 .similar_area {
   flex: 0 0 auto;
-  width: 400px; /* 各セクションの幅をビューポートの幅に設定 */
+  width: 800px; /* 各セクションの幅をビューポートの幅に設定 */
   padding: 0px;
   box-sizing: border-box;
 }
@@ -178,7 +183,7 @@
 
 .similar_scroll-btn {
   position: absolute;
-  top: 2%;
+  top: 4%;
   transform: translateY(-50%);
   background-color: #dbffe1;
   border: none;
@@ -208,9 +213,11 @@
 .img_and_info_container{
     width: 400px;
 }
-.sections-container{
-    width: 400px;
-}
 /* .manga_img_container{
     text-align: center;
   } */
+
+.manga_genre_container{
+    margin-left: 50px;
+}
+

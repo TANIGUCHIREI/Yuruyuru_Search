@@ -31,34 +31,36 @@
 
 
 <div class="about_manga_container">
-  <div class="img_and_info_container">
-    <div class="manga_img_container" ><a class="manga_img"><img style="width: 50%;height: auto;" src="{{ info['img_url'] }}"></a></div>
-
-    {% if info["genre"]!="" %} <p><b>ジャンル:</b>{{ info["genre"] | safe }}</p> {% endif %}
-    {% if info["theme"]!="" %}<p><b>題材:</b>{{ info["theme"] | safe }}</p>{% endif %}
-    {% if info["place"]!="" %}<p><b>舞台:</b>{{ info["place"] | safe }}</p>{% endif %}
-    {% if info["protagonist"]!="" %}<p><b>主人公の属性:</b>{{ info["protagonist"] | safe }}</p>{% endif %}
+  <div class="img_and_info_container" style="text-align: center;">
+    <div class="manga_img_container" ><a class="manga_img"><img style="width: 50%;height: auto;box-shadow: 10px 10px 4px #a3a3a3 ;" src="{{ info['img_url'] }}"></a></div>
+    <div class="manga_genre_container" style="text-align: left; ">
+      {% if info["genre"]!="" %} <p><b>ジャンル:</b>{{ info["genre"] | safe }}</p> {% endif %}
+      {% if info["theme"]!="" %}<p><b>題材:</b>{{ info["theme"] | safe }}</p>{% endif %}
+      {% if info["place"]!="" %}<p><b>舞台:</b>{{ info["place"] | safe }}</p>{% endif %}
+      {% if info["protagonist"]!="" %}<p><b>主人公の属性:</b>{{ info["protagonist"] | safe }}</p>{% endif %}
+      
+      <!-- <p> <b>発表年</b>:{{info['year']}}年</p> -->
+    </div>
     
-    <!-- <p> <b>発表年</b>:{{info['year']}}年</p> -->
   </div>
- 
-    <div id="sections-container" class="table_list-container">
-      <hr size="5">
-      {% if info["table_dict"]|length > 1 %}
-      <button class="scroll-btn prev" onclick="scrollSection(-1)">&#10094;</button>
-      <button class="scroll-btn next" onclick="scrollSection(1)">&#10095;</button>
-      {% endif %}
-      <div class="sections-wrapper">
-        {% for title, dict_ in info["table_dict"].items() %}
-        <section class="area">
-          <h3 style="text-align:center; text-decoration:underline;">{{ title }}</h3>
-          {% for subtitle, disc in dict_.items() %}
-          <p><b>{{ subtitle }}:</b>{{ disc | safe }}</p>
-          {% endfor %}
-        </section>
+   <!--  -->
+  <div id="sections-container" class="table_list-container" style="border: solid; border-color:#d6d6d6; border-radius: 5%;">
+    
+    {% if info["table_dict"]|length > 1 %}
+    <button class="scroll-btn prev" onclick="scrollSection(-1)">&#10094;</button>
+    <button class="scroll-btn next" onclick="scrollSection(1)">&#10095;</button>
+    {% endif %}
+    <div class="sections-wrapper">
+      {% for title, dict_ in info["table_dict"].items() %}
+      <section class="area">
+        <h3 style="text-align:center; text-decoration:underline;">{{ title }}</h3>
+        {% for subtitle, disc in dict_.items() %}
+        <p><b>{{ subtitle }}:</b>{{ disc | safe }}</p>
         {% endfor %}
-      </div>
-  </div>
+      </section>
+      {% endfor %}
+    </div>
+</div>
 
 </div>
 <hr size="5">
@@ -104,7 +106,8 @@
       <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAZlBMVEVHcEzmACLnCynmACLmACPmACPmACPmACPmACPmACHjACDmACLmABvsUGLmACPmABrmABDlAAHrN07zkp76xs3////94ub3tr7uZnP2p7H+7vH82uDpK0LsS1z6ztPwe4b/9/npETQSvJBdAAAAFXRSTlMAJUybvur/9sYgD4ujGdH///////pX1IjeAAABh0lEQVR4AW1TBwKDMAiMK7Z1ENS45/8/2QDGzuvmrmzUC0EYxYnW6S0K7+oXj8yRHkl+/6H1F7LHO1+U+gflmyJM9R+k4eX/5MEgItDrVBQnf/o3Vd1Yh7brNbxHkfwAh9F6TDNKpsTfhV9aR4yrA+tqUZCLnL/hSNZFG6OXmhSLOV3cE47fuNgVggRbnHqs6EcSqJBtZFoMVcDyjdyxi1BFHGCwdkCYh32VgK1zwdpI3dgw2b0HHPwfDaXB8WKVssBVdoCxDh36GJKEkiKtXTVUlj18CDQLxIMIDvCCgymVnEmNC4Dl1HwO/C1VsTcMiCN3UJK2K3+7qejqAye5UQpwXH2IpFHa9HbHxZl7IH6leYE0KkhEsdU4cJUGsfGudHL309bGwMqTrofxNc2c9kULoGqdAyuotcA5uFxAT6Ut09ROw4HnavuV86WuCHqeDwOfi13IPBpf5LXWj4+1l4n+rr2PQoL143CKz9MjQW9+T+/CPW9W9GzyQ3OuYXRLHRlHYfCyPgEPdSsJLTPFFAAAAABJRU5ErkJggg=="
        alt="pinterest" height="32px">
     </a>
-    <h3 style="text-align:center">読む</h3>
+    <hr size="5">
+    <h3 style="text-align:center">購入する</h3>
     <a href="{{info["amazon_url"] }}">
       <img src=https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/220px-Amazon_logo.svg.png
         alt="amazon" height="32px">
@@ -116,13 +119,17 @@
 </div>
 <hr size="5">
 <div class="main_content">
-  {% if info["h2_html"] %}
-  {{ info["h2_html"] | safe}}
-  {% endif %}
 
+  <div class="details">
+      {% if info["h2_html"] %}
+    {{ info["h2_html"] | safe}}
+    {% endif %}
+  </div>
+  
   <hr size="5">
+  
 
-  <div id="sections-container" class="table_list-container" >
+  <div id="sections-container" class="similar_table_list-container" name="sections-container_2" >
     <button class="similar_scroll-btn similar_prev" onclick="similar_scrollSection(-1)">&#10094;</button>
     <button class="similar_scroll-btn similar_next" onclick="similar_scrollSection(1)">&#10095;</button>
     <div class="similar_sections-wrapper">
@@ -207,22 +214,131 @@
       </section>
 
     </div>
+
+  </div>
+
+  <div id="sections-container" class="similar_table_list-container" name="sections-container_4">
+    <button class="similar_scroll-btn similar_prev" onclick="similar_scrollSection(-1)">&#10094;</button>
+    <button class="similar_scroll-btn similar_next" onclick="similar_scrollSection(1)">&#10095;</button>
+    <div class="similar_sections-wrapper">
+      <section class="similar_area">
+        <h2 style="text-align:center; text-decoration:underline;">似ている漫画</h2>
+        <div class="similar-manga-table">
+          <table>
+            {% for manga in info['similar_manga_list']|batch(4, '&nbsp;') %}
+            <tr>
+                {% for item in manga %}
+                <td width="50%">
+                    <div class="manga-item">
+                        <a href="{{ item.url }}">
+                            {% if item.img_url %}
+                            <img src="{{ item.img_url }}" alt="{{ item.title }}">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='images/no_image_tate.jpg') }}" alt="No image available">
+                            {% endif %}
+                            <div class="manga-title" style="color:black">{{ item.title }}</div>
+                        </a>
+                    </div>
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+      </div>
+      </section>
+
+
+      <section class="similar_area">
+        <h2 style="text-align:center; text-decoration:underline;">似ているアニメ</h2>
+        <div class="similar-anime-table">
+          <table>
+            {% for anime in info['similar_anime_list']|batch(4, '&nbsp;') %}
+            <tr>
+                {% for item in anime %}
+                <td width="50%">
+                    <div class="manga-item">
+                        <a href="{{ item.url }}">
+                            {% if item.img_url %}
+                            <img src="{{ item.img_url }}" alt="{{ item.title }}">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='images/no_image_tate.jpg') }}" alt="No image available">
+                            {% endif %}
+                            <div class="manga-title" style="color:black">{{ item.title }}</div>
+                        </a>
+                    </div>
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+      </div>
+      </section>
+
+
+      <section class="similar_area">
+        <h2 style="text-align:center; text-decoration:underline;">似ている小説</h2>
+        <div class="similar-novel-table">
+          <table>
+            {% for novel in info['similar_novel_list']|batch(4, '&nbsp;') %}
+            <tr>
+                {% for item in novel %}
+                <td width="50%">
+                    <div class="manga-item">
+                        <a href="{{ item.url }}">
+                            {% if item.img_url %}
+                            <img src="{{ item.img_url }}" alt="{{ item.title }}">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='images/no_image_tate.jpg') }}" alt="No image available">
+                            {% endif %}
+                            <div class="manga-title" style="color:black">{{ item.title }}</div>
+                        </a>
+                    </div>
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+      </div>
+      </section>
+
+    </div>
+  </div>
+  
 </div>
 
 
   
+  <div class="categories_container">
+      <hr size="5">
+    <h2 style="text-align:center">関連カテゴリ</h2>
+    <ul id="list-container">
+      {% for category,category_id in info["categories"] %}
+      <li><a href="{{" /search_by_category?category=" + category_id }}"><b>{{category}}</b></a></li>
+      {% endfor %}
+    </ul>
+  </div>
   
-  <hr size="5">
-  <h2 style="text-align:center">関連カテゴリ</h2>
-  <ul id="list-container">
-    {% for category,category_id in info["categories"] %}
-    <li><a href="{{" /search_by_category?category=" + category_id }}"><b>{{category}}</b></a></li>
-    {% endfor %}
-  </ul>
 
  
 
 </div>
+
+<script>
+  //スマホかPCかで表示する類似作品リストを決める
+  var sw = window.screen.width;
+  const container_2 = document.getElementsByName("sections-container_2").item(0);
+  const container_4 = document.getElementsByName("sections-container_4").item(0);
+  
+  if(sw<500){
+    container_4.remove();
+    console.log("deleted contaier4");
+  }else{
+    container_2.remove();
+    console.log("deleted contaier2");
+
+  }
+</script>
+
 
 
 <script>
@@ -496,4 +612,6 @@ function similar_updateArrowVisibility() {
   }
 }
 </script>
+
+
 {% endblock %}

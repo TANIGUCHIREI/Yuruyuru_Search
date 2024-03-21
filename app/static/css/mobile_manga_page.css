@@ -78,7 +78,7 @@
     list-style-type: none; /* リストの点を消す */
     margin: 10px; /* マージンで少し間隔を開ける */
     padding: 10px; /* パディングで文字と枠の間隔を開ける */
-    background-color: rgb(211, 236, 186); /* 背景色を緑にする */
+    background-color: #dbffe1; /* 背景色を緑にする */
     color: white; /* 文字色を白にする */
     border-radius: 10px; /* 四隅をラウンドさせる */
     transition: background-color 0.3s; /* 背景色の変化を滑らかにする */
@@ -151,6 +151,12 @@ a:visited{
 
 
 .table_list-container {
+    position: relative;
+    overflow: hidden;
+    width: 90vw; /* コンテナの幅をビューポート幅に設定 */
+  }
+
+  .similar_table_list-container {
     position: relative;
     overflow: hidden;
     width: 90vw; /* コンテナの幅をビューポート幅に設定 */

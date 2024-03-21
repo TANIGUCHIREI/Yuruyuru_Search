@@ -781,7 +781,7 @@ def return_manga_info(title:str,year:int):
     info["categories"]=[[category,encode_filename(category)]for category in categories] 
     info['table_dict'] = desc["table_dict"]
 
-    similar_contents_dict = create_sililar_contents_list(title,num=10) #似た漫画をここで検索する
+    similar_contents_dict = create_sililar_contents_list(title,num=8) #似た漫画をここで検索する
     info['similar_manga_list'] = similar_contents_dict["manga"] 
     info['similar_novel_list'] = similar_contents_dict["novel"] 
     info['similar_anime_list'] = similar_contents_dict["anime"] 

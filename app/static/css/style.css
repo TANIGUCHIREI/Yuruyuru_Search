@@ -39,6 +39,7 @@ header {
   max-width: 2000px;
   margin: auto;
   padding: 20px;
+  background-color:#ffffff;
 }
 
 .container {
@@ -199,7 +200,7 @@ td {
 /* 割合のバー */
 body {
   font-family: Arial, sans-serif;
-  background-color: #ffffff; /* Adjust to match the dark background */
+  background-color: #f8f8f8; /* Adjust to match the dark background */
   color: black; /*ここが全体のフォントの色？*/
   margin: 0;
   padding: 20px;
