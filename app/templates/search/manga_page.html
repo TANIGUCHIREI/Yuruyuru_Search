@@ -32,7 +32,7 @@
 
 <div class="about_manga_container">
   <div class="img_and_info_container">
-    <div class="manga_img_container"><a class="manga_img"><img src="{{ info['img_url'] }}"></a></div>
+    <div class="manga_img_container" ><a class="manga_img"><img style="width: 50%;height: auto;" src="{{ info['img_url'] }}"></a></div>
 
     {% if info["genre"]!="" %} <p><b>ジャンル:</b>{{ info["genre"] | safe }}</p> {% endif %}
     {% if info["theme"]!="" %}<p><b>題材:</b>{{ info["theme"] | safe }}</p>{% endif %}
