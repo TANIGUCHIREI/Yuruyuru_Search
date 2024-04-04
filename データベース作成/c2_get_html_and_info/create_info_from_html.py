@@ -277,7 +277,7 @@ def create_title_and_authors_data(soup):
             init_text+=text
             break
     
-    author_pattern =r"は、.*?による|は.*?による"
+    author_pattern =r"は、.*?による|は.*?による|は.*?の"
     title_pattern=r"『.*?』"
     parentheses_pattern = r"\(.*?\)|（.*?）"
     # title_and_parentheses_pattern=r"『.*?』\(.*?\)|『.*?』（.*?）"
