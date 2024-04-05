@@ -261,7 +261,11 @@ def create_title_and_authors_data(soup):
         
         if h2_title!="要約":break #今回使うのは初めのh2のみ！
     
-    abs_init_text_list = h2_dict["要約"].split("。")
+    try:
+        abs_init_text_list = h2_dict["要約"].split("。")
+    except KeyError:
+        print(f"KeyError発生！ {word_buff=}")
+        abs_init_text_list =""
     init_text = ""
     for text in abs_init_text_list:
         text=text.replace("\n","")
@@ -277,7 +281,7 @@ def create_title_and_authors_data(soup):
             init_text+=text
             break
     
-    author_pattern =r"は、.*?による|は.*?による|は.*?の"
+    author_pattern =r"は、.*?による|は.*?による"
     title_pattern=r"『.*?』"
     parentheses_pattern = r"\(.*?\)|（.*?）"
     # title_and_parentheses_pattern=r"『.*?』\(.*?\)|『.*?』（.*?）"
@@ -286,7 +290,12 @@ def create_title_and_authors_data(soup):
     if pronounce_text!=[]:pronounce_text=pronounce_text[0].replace("(","").replace(")","").replace("（","").replace("）","")
     # print(pronounce_text)
     author_text=re.findall(author_pattern,re.sub(parentheses_pattern,"",init_text))
-    if author_text!=[]:author_text=author_text[0].replace("、","").replace("による","")[1:]
+    if author_text!=[]:
+        if "された" in author_text[0]:author_text = [" " + author_text[0].split("された")[1]] #東京創元社より発売された伊井圭による　みたいなやつの処理
+        author_text=author_text[0].replace("、","").replace("による","")[1:]
+        author_text = author_text.replace("原作","@").replace("原案","@").replace("作画","@").replace("漫画","@").replace("・","@").replace("製作","@").replace("監督","@").replace("：","").replace(" ","")
+        author_text = author_text.split("@")
+        author_text = [ auther for auther in author_text  if auther!=""  ]
     # print(author_text)
     return pronounce_text,author_text
             

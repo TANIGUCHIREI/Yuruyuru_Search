@@ -37,12 +37,15 @@ with open ("./data_for_search/info_for_search_dict.pickle", mode='br') as f:
             if media_data["amazon_img"] !="":
                 amazon_img =media_data["amazon_img"]
                 amazon_url = media_data["amazon_url"]
-        year, title, url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories,theme,protagonist,place = data["page_year"], data["page_url"],page_title,amazon_url,amazon_img,data["actor_dict"],data["genre"],data["infobox_dict"],data["media_types"],data["categories"],data["theme_list"],data["protagonist_list"],data["place_list"]
-        page_title_dict[page_title] = [year,url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories,theme,protagonist,place]
+            else:
+                amazon_img =None
+                amazon_url = None
+        year, title, url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories,theme,protagonist,place = data["page_year"],page_title, data["page_url"],amazon_url,amazon_img,data["actor_dict"],data["genre"],data["infobox_dict"],data["media_types"],data["categories"],data["theme_list"],data["protagonist_list"],data["place_list"]
+        page_title_dict[page_title] = [year,url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories,theme,protagonist,place,data["title_pronounce"]]
 
         #次にyear_and_data_dictの作成
-        try:year_and_data_dict[year].append({"title":page_title,"raw_categories":data["categories"],"actors_dict":data["actor_dict"],"infobox_list":data["infobox_list"],"theme_list":data["theme_list"],"protagonist_list":data["protagonist_list"],"place_list":data["place_list"],"genre":data["genre"]})
-        except: year_and_data_dict[year] = [{"title":page_title,"raw_categories":data["categories"],"actors_dict":data["actor_dict"],"infobox_list":data["infobox_list"],"theme_list":data["theme_list"],"protagonist_list":data["protagonist_list"],"place_list":data["place_list"],"genre":data["genre"]}]
+        try:year_and_data_dict[year].append({"title":page_title,"raw_categories":data["categories"],"actors_dict":data["actor_dict"],"infobox_list":data["infobox_list"],"theme_list":data["theme_list"],"protagonist_list":data["protagonist_list"],"place_list":data["place_list"],"genre":data["genre"],"authors":data["authors"],"title_pronounce":data["title_pronounce"]})
+        except: year_and_data_dict[year] = [{"title":page_title,"raw_categories":data["categories"],"actors_dict":data["actor_dict"],"infobox_list":data["infobox_list"],"theme_list":data["theme_list"],"protagonist_list":data["protagonist_list"],"place_list":data["place_list"],"genre":data["genre"],"authors":data["authors"],"title_pronounce":data["title_pronounce"]}]
 
 
 
@@ -735,7 +738,11 @@ def create_html(manga_title,soup):
                 if  any(choice_word in subtitle  for choice_word in ["巻数","話数","製作","発売日","期間","回数","配信日","フォーマット","枚数","期間"]) or any("#"in a for a in text) or any("放送局"in a for a in text) :
                     subtitle_dict[subtitle]+= f'{t},'
                 else:
-                    subtitle_dict[subtitle]+= f'<a href="/search_by_category?category=info:{t}">{t}</a>,'
+                    if any([author in subtitle for author in ["作者","原作","原案","著者","作画"]]):
+                        #作者などの場合はurlを変更する
+                        subtitle_dict[subtitle]+= f'<a href="/search_by_category?category=作:{t}">{t}</a>,'
+                    else: 
+                        subtitle_dict[subtitle]+= f'<a href="/search_by_category?category=info:{t}">{t}</a>,'
         
         return_table_dict[title] = subtitle_dict
             
@@ -768,7 +775,7 @@ def create_descrption_from_title(title:str,year:int):
 def return_manga_info(title:str,year:int):
     # for t in manga_title_dict[title]:
     #     print(t)
-    year,url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories,theme,protagonist,place = page_title_dict[title]
+    year,url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories,theme,protagonist,place,title_pronounce = page_title_dict[title]
     info ={}
     info["title"] =title
     
@@ -994,6 +1001,7 @@ def search_database(input_word,
         input_theme_list = []
         input_protagonist_list = []
         input_place_list = []
+        input_author_list = []
         for category in input_categories:
             if "担当:" in category:
                 input_actors_list.append(category.replace("担当:","")) #ここに追加する
@@ -1011,6 +1019,9 @@ def search_database(input_word,
             elif "舞台:" in category:
                 input_place_list.append(category.replace("舞台:","")) #ここに追加する
                 input_categories.remove(category) #ここからは消す
+            elif "作:" in category:
+                input_author_list.append(category.replace("作:","")) #ここに追加する
+                input_categories.remove(category) #ここからは消す
         selected_manga_title_list = []
         title_and_match_category_count_dict = {}
         #カテゴリが選択されているのなら
@@ -1025,6 +1036,7 @@ def search_database(input_word,
                 place_list = data["place_list"]
                 page_title = data["title"]
                 genre_list = data["genre"]
+                author_list = data["authors"]
                 if not any( [ True if page_title_dict[page_title][7][type_] else False for type_ in input_media_types]):continue #検索条件にヒットしない場合は除外する！
                 True_or_False_list = []
                 #まずは通常のカテゴリの処理
@@ -1067,6 +1079,12 @@ def search_database(input_word,
                         True_or_False_list.append(True)
                     else:True_or_False_list.append(False)
                 else:True_or_False_list.append(True) #removeされた結果何もないのならとりあえずTrueにしておく]
+                #著者の処理 
+                if input_place_list!=[]:
+                    if  all(info in author_list for info in input_author_list):
+                        True_or_False_list.append(True)
+                    else:True_or_False_list.append(False)
+                else:True_or_False_list.append(True) #removeされた結果何もないのならとりあえずTrueにしておく]
                 #全てがTrueならば情報を追加する
                 if  all(True_or_False_list):
                     selected_manga_title_list.append(data["title"])                
@@ -1083,6 +1101,7 @@ def search_database(input_word,
                 place_list = data["place_list"]
                 page_title = data["title"]
                 genre_list = data["genre"]
+                author_list = data["authors"]
                 if not any( [ True if page_title_dict[page_title][7][type_] else False for type_ in input_media_types]):continue #検索条件にヒットしない場合は除外する！
                 True_or_False_list = []
                 True_or_False_list = []
@@ -1134,6 +1153,12 @@ def search_database(input_word,
                         True_or_False_list.append(True)
                     else:True_or_False_list.append(False)
                 else:True_or_False_list.append(False) #removeされた結果何もないのならとりあえずTrueにしておく]
+                #著者の処理 
+                if input_author_list!=[]:
+                    if  any(info in author_list for info in input_author_list):
+                        True_or_False_list.append(True)
+                    else:True_or_False_list.append(False)
+                else:True_or_False_list.append(False) #removeされた結果何もないのならとりあえずTrueにしておく]
 
                 #どれか１つでもTrueならば情報を追加する
                 if  any(True_or_False_list):
@@ -1156,7 +1181,9 @@ def search_database(input_word,
         #無理やり同じ文字が入っていた場合は大きく見せる
         for index, similarity in enumerate(sum):
             title = title_list[index]
-            if query_text in title or query_text.lower().replace("　","").replace(" ","").replace("・","") in title.lower().replace("　","").replace(" ","").replace("・",""):
+            title_pronounce = page_title_dict[title][12]
+            # print(title_pronounce)
+            if query_text in title or query_text.lower().replace("　","").replace(" ","").replace("・","") in title.lower().replace("　","").replace(" ","").replace("・","") or query_text in title_pronounce:
                 sum[index]+=0.3
             elif any([query_text in category for category in page_title_dict[title][8]]):
                 sum[index]+=0.2 #この処理はかなり重いかもしれない...

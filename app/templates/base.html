@@ -107,6 +107,23 @@
         updateEndYearOptions(); //ロード時に変更してしまう
     });
     </script>
-  
+
+
+    <script>
+      //textareaにてEnterキーが押された場合に自動でpostするためのスクリプト
+      
+      document.addEventListener('DOMContentLoaded', function () {
+          var textArea = document.getElementById('inputText');
+          textArea.addEventListener('keydown', function(e) {
+              // Enterキーが押され、かつShiftキーが押されていない場合
+              if (e.keyCode === 13 && !e.shiftKey) {
+                  e.preventDefault(); // デフォルトの改行動作をキャンセル
+                  var form = document.getElementById('searchForm'); // フォームのIDを指定
+                  form.submit(); // フォームを送信
+              }
+          });
+      });
+      </script>
+
 </body>
 </html>

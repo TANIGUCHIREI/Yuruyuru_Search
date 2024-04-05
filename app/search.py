@@ -25,12 +25,16 @@ with open("./data_for_search/full_theme_list.pickle","rb") as f:
 
 with open("./data_for_search/full_protagonist_list.pickle","rb") as f:
     full_protagonist_list = pickle.load(f)
+with open("./data_for_search/full_authors_list.pickle","rb") as f:
+    full_authors_list = pickle.load(f)
+
 with open("./data_for_search/genre_list.pickle","rb") as f:
     full_genre_list = pickle.load(f)
 
 category_list +=[ "担当:"+actor for actor in full_actor_list]
 category_list +=[ "舞台:"+actor for actor in full_place_list]
 category_list +=[ "主人公の属性:"+actor for actor in full_protagonist_list]
+category_list +=[ "作:"+actor for actor in full_authors_list]
 category_list +=[ "題材:"+actor for actor in full_theme_list]
 category_list +=[ "ジャンル:"+actor for actor in full_genre_list]
 category_list=list(reversed(category_list))
