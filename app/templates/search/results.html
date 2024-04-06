@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
-
+{% block header %}
+  <div>
+    <!-- {% block title %}検索結果{% endblock %} -->
+  </div>
+{% endblock %}
 {% block content %}
 <script>
   window.onload = function() {
@@ -92,7 +96,7 @@
     <tr>
       <th id="sort-recommendation" class="sortable">おすすめランク↕</th>
       <th id="sort-started-at" class="sortable">連載開始時↕</th>
-      <th>漫画タイトルと画像</th>
+      <th>作品タイトルと画像</th>
       {% if actor_select %}<th>キャラクター</th>{% endif %}
     </tr>
     {% for result in results %}

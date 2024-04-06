@@ -307,3 +307,30 @@ td a:hover{
   cursor: pointer;
   text-decoration: underline;
 }
+
+.random_work{
+  display: flex;
+  justify-content: center;
+  margin-left: 30px;
+}
+.random_work a{
+  max-width: 150px;
+}
+.random_work img{
+  max-width: 150px;
+}
+.chara_and_random_work{
+  display: flex;
+  justify-content: center;
+
+}
+.chara_and_random_work #pip{
+  max-width: 70px;
+  position: relative;
+  bottom: -80px;
+}
+.chara_and_random_work #mmu-n{
+  max-width: 100px;
+  position: relative;
+  bottom: -80px;
+}

@@ -26,20 +26,12 @@ with open ("./data_for_search/info_for_search_dict.pickle", mode='br') as f:
     info_for_search_dict  = pickle.load(f)
     for page_title,data in info_for_search_dict.items():
         #データを収集しした逆のやり方でimgとamaozn_urlを取得する
-        media_type = None
-        if data["media_types"]["manga"]:
-            media_type="manga"
-        elif data["media_types"]["novel"]:
-            media_type="novel"
-        elif data["media_types"]["anime"]:
-            media_type="anime"
-        for index,media_data in enumerate(data["media_dict"][media_type]):
-            if media_data["amazon_img"] !="":
-                amazon_img =media_data["amazon_img"]
-                amazon_url = media_data["amazon_url"]
-            else:
-                amazon_img =None
-                amazon_url = None
+        for media_type in ["manga","anime","novel"]:
+            for index,media_data in enumerate(data["media_dict"][media_type]):
+                if media_data["amazon_img"] !="":
+                    amazon_img =media_data["amazon_img"]
+                    amazon_url = media_data["amazon_url"]
+                    break
         year, title, url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories,theme,protagonist,place = data["page_year"],page_title, data["page_url"],amazon_url,amazon_img,data["actor_dict"],data["genre"],data["infobox_dict"],data["media_types"],data["categories"],data["theme_list"],data["protagonist_list"],data["place_list"]
         page_title_dict[page_title] = [year,url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories,theme,protagonist,place,data["title_pronounce"]]
 
@@ -1327,3 +1319,24 @@ if __name__ == "__main__":
 
     for result in return_results:
         print(result)
+
+
+import random
+def return_random_work():
+    return_data = None
+    # print(len(page_title_dict))
+    random_num = random.randint(0,len(page_title_dict)) #ランダムにindexを決める
+    for index, title in enumerate(page_title_dict):
+        if index < random_num:continue
+
+        year,url,amazon_url,img_url,actors_dict,genre,infobox_dict,media_types,categories,theme,protagonist,place,title_pronounce = page_title_dict[title]
+        if img_url =="" or  img_url ==None:continue #imgがあるものを見つけるまで永遠にループ
+        else:
+            url =  "/manga_page?title=" + encode_filename(title) +"&year=" + str(year)
+            return_data = {"title":title,"img_url":img_url,"url":url}
+            break
+    
+    return return_data
+
+if __name__ =="__main__":
+    print(return_random_work())

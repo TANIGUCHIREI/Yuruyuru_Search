@@ -64,7 +64,7 @@ header {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  max-width: 400px;
+  max-width: 1000px;
   margin: auto;
 }
 
@@ -304,4 +304,31 @@ td a:hover{
 .sortable:hover {
   cursor: pointer;
   text-decoration: underline;
+}
+
+.random_work{
+  display: flex;
+  justify-content: center;
+  margin-left: 30px;
+}
+.random_work a{
+  max-width: 200px;
+}
+.random_work img{
+  max-width: 200px;
+}
+.chara_and_random_work{
+  display: flex;
+  justify-content: center;
+
+}
+.chara_and_random_work #pip{
+  max-width: 100px;
+  position: relative;
+  bottom: -80px;
+}
+.chara_and_random_work #mmu-n{
+  max-width: 150px;
+  position: relative;
+  bottom: -80px;
 }

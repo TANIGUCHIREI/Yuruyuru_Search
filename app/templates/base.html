@@ -1,6 +1,17 @@
 <!doctype html>
 <html>
 <head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JZE3B49YRS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-JZE3B49YRS');
+</script>
+
+  <link rel="icon" href="{{ url_for('static', filename='images/favicon (1).ico') }}?v={{ now()}}">
   <meta name="viewport" content="width=device-width,initial-scale=1">  <!-- レスポンシブ対応のためにまず書く必要がある-->
   <script type="text/javascript">
     var full_categoires_list = {{ full_categories_list | tojson | safe }};
@@ -18,12 +29,36 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/AutoComplete.css') }}">
  
 
-  <title>{% block title %}{% endblock %} - ゆるゆる検索（仮）</title>
+  <title>{% block title %}{% endblock %} - ゆるゆる検索|漫画・アニメ・小説を一気に検索＆似ている作品検索</title>
+  
+  <style>
+    .random_work {
+      text-align: center; /* テキストを中央揃えにします */
+      display: flex; /* Flexbox モデルを使用 */
+      flex-direction: column; /* 項目を縦に並べます */
+      align-items: center; /* 項目を軸に沿って中央揃えにします */
+      justify-content: center; /* 項目をコンテナ内で中央に配置します */
+      
+    }
+  
+    .random_work img {
+      margin-top: 10px; /* 画像とテキストの間に余白を追加します */
+    }
+    .random_work a{
+      /* text-decoration: none; */
+      color: black;
+    }
+
+    .other-link-container a{
+      text-decoration: none;
+    }
+  </style>
+
 </head>
 
 <body>
   <nav>
-    <h3 style="text-align: center;"><a href="/" style="color:black">ゆるゆる検索（仮)</a></h3>
+    <h3 style="text-align: center;"><a href="/" style="color:black">ゆるゆる検索</a></h3>
   </nav>
 
   <div class="container">
@@ -47,7 +82,7 @@
       <li><a href="{{ url_for('nav.sitepolicy')}}" style="color:black">サイトポリシー</a></li>
       <li><a href="{{ url_for('nav.contact')}}" style="color:black">お問い合わせ</a></li>
     </ul>
-    <small>&copy; 2023 Managa Search</small>
+    <small>&copy; 2023 Yuruyuru Search</small>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.7/dist/autoComplete.min.js"></script>
@@ -126,4 +161,7 @@
       </script>
 
 </body>
+
+
+
 </html>

@@ -47,6 +47,8 @@ application.register_blueprint(search.bp)
 from . import nav
 application.register_blueprint(nav.bp)
 
+from . import SEO
+application.register_blueprint(SEO.bp)
 
 application.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 #https://qiita.com/hiroyuki-inaba/items/6c9db8648240e61d4e80　にかいてあったやる
 application.config['TEMPLATES_AUTO_RELOAD'] = True #自動的にリロードするようにする

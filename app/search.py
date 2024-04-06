@@ -7,7 +7,7 @@ from app.db import get_db
 
 import sys
 sys.path.append('../')
-from use_database4 import search_database,return_manga_info,decode_filename
+from use_database4 import search_database,return_manga_info,decode_filename,return_random_work
 # -> 最終的にapp内に移動させる
 
 
@@ -44,12 +44,15 @@ bp = Blueprint('search', __name__)
 
 @bp.route('/', methods=['GET'])
 def index():
-    return render_template('search/index.html',full_categories_list=category_list,start_year=1900, end_year=2024)
+    random_work=return_random_work()
+    print(random_work)
+    return render_template('search/index.html',full_categories_list=category_list,start_year=1900, end_year=2024,random_work=random_work)
 
 @bp.route('/search', methods=['GET', 'POST'])
 def search():
     if request.method == 'GET':
-        return render_template('search/index.html',full_categories_list=category_list)
+        random_work=return_random_work()
+        return render_template('search/index.html',full_categories_list=category_list, end_year=2024,random_work=random_work)
     elif request.method == 'POST':
         return redirect(url_for(
             'search.results',
@@ -130,18 +133,16 @@ def results():
 
 @bp.route('/manga_page', methods=['GET'])
 def manga_page():
-    title = decode_filename(request.args.get('title')) #タイトルをdecodeしている
-    year = int(request.args.get('year'))
-    info = return_manga_info(title,year)
-    character_id =  "#" + request.args.get('character_id') if request.args.get('character_id') else ""
-    return render_template('search/manga_page.html',info = info,character_id = character_id,full_categories_list=[])
-    #以下のコードは完成時に上２つを置き換える（エラー処理ができるようになっている）
-    # try:
-    #     info = return_manga_info(title,year)
-    #     return render_template('search/manga_page.html',info = info)
-    # except Exception as e:
-    #     print(e)
-    #     return render_template('search/page_not_found.html')
+    try:
+        title = decode_filename(request.args.get('title')) #タイトルをdecodeしている
+        year = int(request.args.get('year'))
+        info = return_manga_info(title,year)
+        character_id =  "#" + request.args.get('character_id') if request.args.get('character_id') else ""
+        return render_template('search/manga_page.html',info = info,character_id = character_id,full_categories_list=[])
+    except Exception as e:
+        #ページが見つからなかったときの対策
+        print(e)
+        return render_template('search/page_not_found.html',full_categories_list=[])
     
     
 
@@ -156,5 +157,4 @@ def search_by_category():
         input_text ="",
         liData = liData,
         ))
-
 

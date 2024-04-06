@@ -14,11 +14,13 @@
   {% endif %}
 </div>
  
-
+<div>
+  <!-- {% block title %}【{{ info["title"] }}】の解説と似た漫画・アニメ・小説{% endblock %} -->
+</div>
 
 {% if info["title"] %}
 <div>
-  <h4>{% block title %}{{ info["title"] }}{% endblock %}</h4>
+  <h4>{{ info["title"] }}</h4>
   <hr size="5">
 </div>
 {% endif %}
@@ -67,7 +69,7 @@
 <div class="other-link-container">
  
     <h3 style="text-align:center">他で調べる</h3>
-  <div style="text-align:center">
+  <div style="text-align:center" >
     <a href="{{info["wiki_url"]}}">
       <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAM1BMVEUAAAD+/v41NTUBAQEAAABZWVknJycWFhaZmZmIiIjp6ellZWXMzMzX19eurq54eHhHR0dExXFyAAAAAXRSTlMAQObYZgAAAPtJREFUeAG8kAWOBDAMA9d1Sin+/7XXbpZZdBaURlMrhx28ycGCD/n0bvkBwJf8C+AoIvRAWGtMyHGtCWkfxW+DRopuuIjUtTQJDStevNoXWaRjRSllLd1O8FFhgEZx2BmkAmHC8HwpOUyxSA50VqOjXgAl50URvNWPBRcAnmwnhbcduthqQCO9KYTFBG7eDWoK1T47AZX9DuiUYT/TuhX3MGpnD51kPprSA9Dl+BCKl7jWHHEHmHsLWhNZZMxPQCLTEuy+cYF6D9i8Q5e2Lcyz4AGwKdJbX0p7AegC2qnvxAsAxQRAYH8J6Dg1a/lvpKRJinMW4cxLMPsDAJjSCaG8cPmnAAAAAElFTkSuQmCC" 
       alt="wikipedia" height="32px">
@@ -119,7 +121,7 @@
 </div>
 <hr size="5">
 <div class="main_content">
-
+  <p>以下は<a href="{{info["wiki_url"]}}">Wikipedia</a>より引用</p>
   <div class="details">
       {% if info["h2_html"] %}
     {{ info["h2_html"] | safe}}
