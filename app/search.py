@@ -107,6 +107,14 @@ def results():
         character_rate, story_rate, overview_rate = 33, 33, 33
         rate = None
 
+    #検索結果二表示されるページタイトルを作成します
+    
+    _isKatsu_or_Matawa = "かつ" if AndOr=="AND" else "または"
+    if categories:categories_text = "【" +f"{_isKatsu_or_Matawa}".join([decode_filename(category) for category in categories]) + "】"
+
+    if input_text=="" and categories:page_title = f"{categories_text}で調べた漫画・小説・アニメ"
+    elif input_text!="" and not  categories:page_title = f"{categories_text}で調べた漫画・小説・アニメ"
+    else: page_title = f"{categories_text}＆「{input_text}」で調べた漫画・小説・アニメ"
     return_results = search_database(
         input_text,
         input_categories= categories,
@@ -124,11 +132,11 @@ def results():
         suggest_category_num= 5,
         return_num = 100,
         show_result = False,
-        selecte_media_types = {"manga":manga,"anime":anime,"novel":novel}
+        selecte_media_types = {"manga":manga,"anime":anime,"novel":novel},
     )
 
     form_info = {'useGPT':use_gpt,'searchall':searchall,'toggleSlider':toggleSliders,'story_age_checkbox':story_age_checkbox,'AndOR':AndOr,"manga":manga,"anime":anime,"novel":novel,}
-    return render_template('search/results.html',full_categories_list=category_list, results=return_results, input_text=input_text, rate=rate,form_info=form_info,categories=categories,actor_select=actor_select,start_year=search_init_year,end_year=search_final_year)
+    return render_template('search/results.html',full_categories_list=category_list, results=return_results, input_text=input_text, rate=rate,form_info=form_info,categories=categories,actor_select=actor_select,start_year=search_init_year,end_year=search_final_year,page_title = page_title)
 
 
 @bp.route('/manga_page', methods=['GET'])

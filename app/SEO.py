@@ -14,3 +14,10 @@ def robots():
 @bp.route('/sitemap.xml', methods=['GET'])
 def sitemap():
     return render_template('SEO/sitemap.xml',full_categories_list=[])
+@bp.route('/categories_sitemap.xml', methods=['GET'])
+def categories_sitemap():
+    return render_template('SEO/categories_sitemap.xml',full_categories_list=[])
+#就活用のポートフォリオ表示用
+# @bp.route('/ぽ/お/と/ふ/ぉ/り/お', methods=['GET'])
+# def portfolio():
+#     return render_template('others/portfolio.html',full_categories_list=[])
