@@ -26,6 +26,9 @@
   <form method="post" action="/search" id="searchForm">
     <h1 style="text-align: center;">作品を検索する</h1>
     <p style="text-align: center;">使い方は<a href="/aboutsite">こちら</a></p>
+    
+    <hr>
+    <br>
     <div class="checkbox-container">
       
       <div class="select-year-container" style="display: flex; text-align: center;">
@@ -88,8 +91,7 @@
     <div class="autoComplete_container" >
       <br>
       <br>
-      <label  >関連カテゴリ</label>
-      <br>
+      <div style="text-align: center;"><label  >関連カテゴリを探して追加</label></div>
       <input type="radio" name="AndOR" value="AND" />AND
       <input type="radio" name="AndOR" value="OR" checked/>OR
       <input type="text" id="autoComplete">
@@ -97,7 +99,9 @@
 
     </div>
 
-    <textarea id="inputText" name="inputText" rows="4" placeholder="なんでも入力どうぞ" required></textarea>
+    <br>
+    <div style="text-align: center;"><label  >単語または文章で検索</label></div>
+    <textarea id="inputText" name="inputText" rows="4" placeholder="気になる単語や文章をここに入力してください。ゆる〜く検索します。" required></textarea>
     <!-- <input type="type" id="inputText" name="inputText" placeholder="検索したい質問の要素を入力してください" required> -->
 
     <input type="submit" value="検索">

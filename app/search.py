@@ -113,7 +113,7 @@ def results():
     if categories:categories_text = "【" +f"{_isKatsu_or_Matawa}".join([decode_filename(category) for category in categories]) + "】"
 
     if input_text=="" and categories:page_title = f"{categories_text}で調べた漫画・小説・アニメ"
-    elif input_text!="" and not  categories:page_title = f"{categories_text}で調べた漫画・小説・アニメ"
+    elif input_text!="" and not  categories:page_title = f"「{input_text}」で調べた漫画・小説・アニメ"
     else: page_title = f"{categories_text}＆「{input_text}」で調べた漫画・小説・アニメ"
     return_results = search_database(
         input_text,
