@@ -5,6 +5,7 @@
 import smtplib
 from email.mime.text import MIMEText
 import json
+import os
 
 def send_gmail(mail_from, mail_to, mail_subject, mail_body):
 
@@ -20,8 +21,8 @@ def send_gmail(mail_from, mail_to, mail_subject, mail_body):
         smtpobj = smtplib.SMTP('smtp.gmail.com', 587)  # SMTPオブジェクトを作成。smtp.gmail.comのSMTPサーバーの587番ポートを設定。
         smtpobj.ehlo()                                 # SMTPサーバとの接続を確立
         smtpobj.starttls()                             # TLS暗号化通信開始
-        gmail_addr = "yuruyurusearch@gmail.com"       # Googleアカウント(このアドレスをFromにして送られるっぽい)
-        app_passwd = "bpri yddj jnna lkex"    # アプリパスワード
+        gmail_addr = os.environ.get("gmail_addr")       # Googleアカウント(このアドレスをFromにして送られるっぽい)
+        app_passwd = os.environ.get("app_passwd")    # アプリパスワード
         smtpobj.login(gmail_addr, app_passwd)          # SMTPサーバーへログイン
 
         """ メール送信 """
