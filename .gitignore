@@ -1,6 +1,0 @@
-# app.logはめちゃくちゃ大きくなるので除外する
-*.log
-**/.vscode/**
-**/__pycache__/**
-# **/data_for_search/main_wiki_html/**
-*.pickle
